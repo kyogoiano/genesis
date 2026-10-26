@@ -27,3 +27,8 @@ The old Ant build remains available for legacy test, deployment, and site tasks.
 Those tasks require the external JBoss installation and configuration described
 in the historical Ant instructions, and continue to use the dependency JARs
 under `lib/` and `../xdoclet/dist/`.
+
+The Ant build files are retained because `build.xml` provides EJB generation
+and legacy targets, `build_dist.xml` assembles the distribution, and
+`master_build.xml`, `desktop_build.xml`, and `web_build.xml` are used by the
+sample-project build templates. They are not unused Gradle leftovers.
