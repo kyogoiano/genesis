@@ -1,0 +1,172 @@
+/*
+ * The Genesis Project
+ * Copyright (C) 2006-2008  Summa Technologies do Brasil Ltda.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+package net.java.dev.genesis.ui.metadata;
+
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+
+import net.java.dev.genesis.annotation.Action;
+import net.java.dev.genesis.annotation.DataProvider;
+import net.java.dev.genesis.annotation.NotBound;
+import net.java.dev.genesis.script.ScriptRegistry;
+import net.java.dev.genesis.ui.metadata.annotation.AnnotationHandler;
+import net.java.dev.genesis.ui.metadata.annotation.AnnotationHandlerRegistry;
+
+import net.java.dev.genesis.util.Bundle;
+import org.apache.commons.beanutils.PropertyUtils;
+
+public class DefaultFormMetadataFactory implements FormMetadataFactory {
+   public FormMetadata getFormMetadata(final Class formClass) {
+      FormMetadata formMetadata = FormMetadataRegistry.getInstance().get(formClass);
+
+      if (formMetadata == null) {
+         formMetadata = new FormMetadata(formClass, ScriptRegistry.getInstance().getScript());
+         processAnnotations(formMetadata);
+         FormMetadataRegistry.getInstance().register(formClass, formMetadata);
+      }
+
+      return formMetadata;
+   }
+
+   private void processAnnotations(final FormMetadata formMetadata) {
+      processFormAnnotations(formMetadata);
+      processFieldsAnnotations(formMetadata);
+      processMethodsAnnotations(formMetadata);
+   }
+
+   private void processFormAnnotations(final FormMetadata formMetadata) {
+      final Annotation[] annotations = formMetadata
+            .getFormClass().getAnnotations();
+      AnnotationHandler handler;
+      for (int i = 0; i < annotations.length; i++) {
+         handler = AnnotationHandlerRegistry.getInstance().get(annotations[i].annotationType());
+
+         if (handler == null) {
+            continue;
+         }
+
+         handler.processFormAnnotation(formMetadata,
+               annotations[i]);
+      }
+   }
+
+   private void processFieldsAnnotations(final FormMetadata formMetadata) {
+      final Class clazz = formMetadata.getFormClass();
+      final PropertyDescriptor[] propertyDescriptors = PropertyUtils
+            .getPropertyDescriptors(clazz);
+      PropertyDescriptor propDesc;
+      FieldMetadata fieldMetadata;
+      for (int i = 0; i < propertyDescriptors.length; i++) {
+         propDesc = propertyDescriptors[i];
+
+         // Ignoring java.lang.Object.getClass()
+         if (propDesc.getName().equals("class")) { // NOI18N
+            continue;
+         }
+
+         final Method readMethod = getReadMethod(clazz, propDesc);
+
+         if (readMethod == null ||
+               readMethod.getAnnotation(NotBound.class) != null) {
+            continue;
+         }
+
+         fieldMetadata = new FieldMetadata(propDesc.getName(), propDesc
+               .getPropertyType(), propDesc.getWriteMethod() != null);
+         formMetadata.addFieldMetadata(propDesc.getName(), fieldMetadata);
+         processFieldAnnotations(formMetadata, fieldMetadata, readMethod);
+      }
+   }
+
+   private void processFieldAnnotations(final FormMetadata formMetadata,
+         final FieldMetadata fieldMetadata, final Method fieldGetterMethod) {
+      final Annotation[] annotations = fieldGetterMethod.getAnnotations();
+      AnnotationHandler handler;
+      for (int i = 0; i < annotations.length; i++) {
+         handler = AnnotationHandlerRegistry.getInstance().get(annotations[i].annotationType());
+
+         if (handler == null) {
+            continue;
+         }
+
+         handler.processFieldAnnotation(formMetadata,
+               fieldMetadata, annotations[i]);
+      }
+   }
+
+   private void processMethodsAnnotations(final FormMetadata formMetadata) {
+      final Method[] methods = formMetadata.getFormClass().getMethods();
+      boolean isAction;
+      boolean isProvider;
+      MethodMetadata methodMetadata;
+
+      for (int i = 0; i < methods.length; i++) {
+         isAction = methods[i].getAnnotation(Action.class) != null;
+         isProvider = methods[i].getAnnotation(DataProvider.class) != null;
+
+         if (!isAction && !isProvider) {
+            continue;
+         }
+
+         if (formMetadata.getFieldMetadata(methods[i].getName()) != null) {
+            throw new IllegalArgumentException(Bundle.getMessage(
+                  DefaultFormMetadataFactory.class, "AN_ACTION_OR_DATAPROVIDER_CANNOT_HAVE_THE_SAME_NAME_OF_A_PROPERTY", // NOI18N
+                  methods[i].getName()));
+         }
+
+         methodMetadata = new MethodMetadata(methods[i], isAction, isProvider);
+         formMetadata.addMethodMetadata(methods[i], methodMetadata);
+         processMethodAnnotations(formMetadata, methodMetadata, methods[i]);
+      }
+   }
+
+   private void processMethodAnnotations(final FormMetadata formMetadata,
+         final MethodMetadata methodMetadata, final Method actionMethod) {
+      final Annotation[] annotations = actionMethod.getAnnotations();
+      AnnotationHandler handler;
+      for (int i = 0; i < annotations.length; i++) {
+         handler = AnnotationHandlerRegistry.getInstance().get(annotations[i].annotationType());
+
+         if (handler == null) {
+            continue;
+         }
+
+         handler.processMethodAnnotation(formMetadata,
+               methodMetadata, annotations[i]);
+      }
+   }
+
+   // Work around for a bug in JDK 1.4.2
+   private Method getReadMethod(Class clazz, PropertyDescriptor pd) {
+      Method method = pd.getReadMethod();
+
+      if (method == null || clazz.equals(method.getDeclaringClass())) {
+         return method;
+      }
+
+      try {
+         method = clazz.getMethod(method.getName(), 
+               method.getParameterTypes());
+         return (method == null) ? pd.getReadMethod() : method;
+      } catch (NoSuchMethodException nsme) {
+         return method;
+      }
+   }
+}

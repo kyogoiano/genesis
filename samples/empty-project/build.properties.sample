@@ -1,0 +1,25 @@
+## Developer specific properties sample ##
+#################################################################################
+## Use these properties for running the sample in LOCAL or REMOTE MODE          
+jboss.home=/opt/jboss-4.2.0.GA
+
+
+#################################################################################
+## Use these properties for running the sample in LOCAL MODE ONLY               
+#remote.mode=false
+#jdbc.driver=target/hsqldb.jar
+
+
+#################################################################################
+## Use these properties for running the sample in REMOTE MODE ONLY              
+#local.mode=false
+#jboss.home=/opt/jboss-4.2.0.GA
+
+#################################################################################
+## These properties already have a default value defined in build.xml and only  
+## need to be defined in build.properties if their values are different in your 
+## local setup                                                                  
+#genesis.home=../../genesis
+#jboss.provider.url=jnp://localhost
+#webstart.server=localhost
+#webstart.port=8080

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../../xdoclet/modules/build/build.iml" filepath="$PROJECT_DIR$/../../../xdoclet/modules/build/build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../xdoclet/modules/genesis/genesis.iml" filepath="$PROJECT_DIR$/../../../xdoclet/modules/genesis/genesis.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../xdoclet/modules/hibernate/hibernate.iml" filepath="$PROJECT_DIR$/../../../xdoclet/modules/hibernate/hibernate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../xdoclet/xdoclet-genesis-modules.iml" filepath="$PROJECT_DIR$/../../../xdoclet/xdoclet-genesis-modules.iml" />
+    </modules>
+  </component>
+</project>

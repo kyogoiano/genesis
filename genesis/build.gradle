@@ -1,0 +1,152 @@
+plugins {
+    id 'base'
+}
+
+group = 'net.java.dev.genesis'
+version = '3.3'
+
+def localJars = { String directory, String pattern = '*.jar' ->
+    fileTree(dir: rootProject.file("lib/${directory}"), include: pattern)
+}
+
+subprojects {
+    apply plugin: 'java-library'
+
+    group = rootProject.group
+    version = rootProject.version
+
+    sourceSets {
+        main {
+            java.setSrcDirs(['src'])
+            resources.setSrcDirs([])
+        }
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release.set(8)
+    }
+
+    tasks.named('jar') {
+        archiveBaseName.set("genesis-${project.name}")
+    }
+}
+
+project(':shared') {
+    sourceSets.main.java.srcDir project(':annotation').file('src')
+    sourceSets.main.resources.srcDir('src')
+    sourceSets.main.resources.include('**/Bundle*.properties')
+
+    dependencies {
+        api localJars('aspectwerkz', 'aspectwerkz-*.jar')
+        api localJars('hibernate', 'hibernate*.jar')
+        api localJars('commons', 'commons-beanutils*.jar')
+        api localJars('commons', 'commons-logging*.jar')
+        api localJars('commons', 'reusable-components*.jar')
+    }
+}
+
+project(':server') {
+    def generatedSources = layout.buildDirectory.dir('generated/sources/xdoclet/main')
+    configurations.create('xdoclet')
+
+    sourceSets.main.java.srcDir(generatedSources)
+    sourceSets.main.resources.srcDir(generatedSources)
+    sourceSets.main.resources.include('**/*.xml')
+
+    dependencies {
+        implementation project(':shared')
+        implementation localJars('hibernate', 'hibernate*.jar')
+        implementation localJars('commons', 'commons-logging*.jar')
+        implementation files(rootProject.file('lib/j2ee/jboss-j2ee.jar'))
+        xdoclet fileTree(dir: rootProject.file('../xdoclet/dist'), include: '*.jar')
+    }
+
+    tasks.register('generateEjbSources') {
+        inputs.files(fileTree('src') { include '**/*EJB.java' })
+        outputs.dir(generatedSources)
+
+        doLast {
+            def destination = generatedSources.get().asFile
+            destination.mkdirs()
+
+            ant.taskdef(
+                    name: 'ejbdoclet',
+                    classname: 'xdoclet.modules.ejb.EjbDocletTask',
+                    classpath: configurations.xdoclet.asPath +
+                            File.pathSeparator + rootProject.file('lib/j2ee/jboss-j2ee.jar')
+            )
+            ant.ejbdoclet(destdir: destination.absolutePath, ejbSpec: '2.1') {
+                fileset(dir: file('src'), includes: '**/*EJB.java')
+                deploymentdescriptor(
+                        destdir: new File(destination, 'META-INF').absolutePath,
+                        validatexml: false,
+                        xmlencoding: 'ISO-8859-1'
+                )
+                homeinterface()
+                localhomeinterface()
+                remoteinterface()
+                localinterface()
+            }
+        }
+    }
+
+    tasks.named('compileJava') {
+        dependsOn tasks.named('generateEjbSources')
+    }
+    tasks.named('processResources') {
+        dependsOn tasks.named('generateEjbSources')
+    }
+}
+
+project(':client') {
+    sourceSets.main.resources.srcDir('src')
+    sourceSets.main.resources.include('**/Bundle*.properties')
+
+    dependencies {
+        implementation project(':shared')
+        implementation project(':annotation')
+        implementation localJars('script')
+        implementation localJars('backport175')
+        implementation localJars('commons', 'commons-beanutils*.jar')
+        implementation localJars('commons', 'commons-logging*.jar')
+        implementation localJars('commons', 'commons-validator*.jar')
+        implementation localJars('commons', 'reusable-components*.jar')
+        implementation localJars('thinlet', 'thinlet*.jar')
+    }
+}
+
+project(':aspect') {
+    sourceSets.main.resources.srcDir('src')
+    sourceSets.main.resources.include('**/*.properties')
+
+    dependencies {
+        implementation project(':shared')
+        implementation project(':server')
+        implementation project(':client')
+        implementation localJars('backport175')
+        implementation localJars('aspectwerkz')
+        implementation localJars('hibernate', 'hibernate*.jar')
+        implementation files(rootProject.file('lib/j2ee/jboss-j2ee.jar'))
+        implementation localJars('commons', 'commons-beanutils*.jar')
+        implementation localJars('commons', 'commons-logging*.jar')
+        implementation localJars('commons', 'reusable-components*.jar')
+        implementation localJars('thinlet', 'thinlet*.jar')
+        implementation localJars('script', 'commons-jxpath*.jar')
+    }
+}
+
+project(':container') {
+    dependencies {
+        implementation localJars('commons', 'commons-logging*.jar')
+    }
+}
+
+tasks.named('build') {
+    dependsOn subprojects.collect { it.tasks.named('build') }
+}

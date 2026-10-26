@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE server>
+
+<!-- Generated file - Do not edit! -->
+
+<server>
+   <mbean code="net.sf.hibernate.jmx.HibernateService" name="jboss.jca:service=HibernateFactory,name=HibernateFactory">
+       <depends>jboss.jca:service=RARDeployer</depends>
+       <depends>jboss.jca:service=5,name=DefaultDS</depends>
+       <attribute name="MapResources"></attribute>
+       <attribute name="JndiName">jboss:/hibernate/SessionFactory</attribute>
+       <attribute name="Datasource">java:/DefaultDS</attribute>
+       <attribute name="Dialect">org.hibernate.dialect.HSQLDialect</attribute>
+       <attribute name="ShowSqlEnabled"></attribute>
+       <attribute name="UserTransactionName">UserTransaction</attribute>
+       <attribute name="TransactionStrategy">org.hibernate.transaction.JTATransactionFactory</attribute>
+       <attribute name="TransactionManagerLookupStrategy">org.hibernate.transaction.JBossTransactionManagerLookup</attribute>
+   </mbean>
+
+</server>

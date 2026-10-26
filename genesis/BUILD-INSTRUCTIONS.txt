@@ -1,0 +1,13 @@
+## Gradle build
+
+The production modules are built with Gradle and target Java 8. Run these
+commands from the `genesis` directory:
+
+   gradle build
+
+The build uses the dependency JARs under `lib/` and the XDoclet JARs under
+`../xdoclet/dist/` to generate the server EJB interfaces.
+
+The old Ant build remains available for legacy test, deployment, and site tasks.
+Those tasks require the external JBoss installation and configuration described
+in the historical Ant instructions.

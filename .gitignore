@@ -1,1 +1,8 @@
 /ant-tasks/
+/.idea/
+/genesis/modules/annotation/build/
+/genesis/modules/aspect/build/
+/genesis/modules/client/build/
+/genesis/modules/container/build/
+/genesis/modules/server/build/
+/genesis/modules/shared/build/

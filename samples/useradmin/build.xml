@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="useradmin" default="all" basedir="."
+         xmlns:genesis="https://genesis.dev.java.net/nonav/ns/master_build.xml">
+   <import file="desktop_build.xml" />
+
+   <target name="-pre-init">
+      <!-- Load developer specific properties -->
+      <property file="build.properties" />
+
+      <!-- Load project specific properties -->
+      <property file="project.properties" />
+   </target>
+
+   <target name="dist" depends="clean,compile,weaving,jar,server-artifact,webstart" 
+              description="Creates the project distribution"/>
+
+   <target name="install"
+           depends="shared:hibernate-doclet,server-artifact,copy-local-dependency-jars,webstart,deploy" />
+   
+   <target name="copy-local-dependency-jars" unless="server.artifact.needed">
+      <copy todir="${build.dir}">
+         <fileset file="${jar.local.location}" />
+         <fileset dir="${hibernate.dist}">
+            <include name="cglib-full-*.jar"/>
+            <include name="ehcache-*.jar"/>
+            <include name="jta*.jar"/>
+         </fileset>
+         <fileset dir="${genesis.dist}">
+            <include name="genesis-annotation-*.jar" />
+            <include name="genesis-aspect-annotated-*.jar" />
+            <include name="genesis-client-*.jar" />
+         </fileset>
+         <fileset dir="${aspectwerkz.dist}">
+            <include name="aspectwerkz-*.jar" />
+            <include name="dom4j-*.jar" />
+            <include name="jrexx-*.jar" />
+            <include name="trove-*.jar" />
+         </fileset>
+         <fileset dir="${hibernate.dist}">
+            <include name="hibernate2.jar" />
+            <include name="commons-collections-*.jar" />
+            <include name="odmg-*.jar" />
+         </fileset>
+         <fileset dir="${commons.dist}">
+            <include name="commons-beanutils-*.jar" />
+            <include name="commons-digester-*.jar" />
+            <include name="commons-jxpath-*.jar" />
+            <include name="commons-logging-*.jar" />
+            <include name="commons-validator-*.jar" />
+            <include name="jakarta-oro-*.jar" />
+            <include name="reusable-components-*.jar" />
+         </fileset>
+         <fileset dir="${script.dist}" includes="*.jar" />
+      </copy>
+   </target>
+</project>
