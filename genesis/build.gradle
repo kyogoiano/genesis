@@ -163,6 +163,8 @@ project(':container') {
 }
 
 project(':tests') {
+    def embeddedModule = layout.buildDirectory.dir('embedded/container')
+
     sourceSets.main.java.setSrcDirs([])
     sourceSets.main.resources.setSrcDirs([])
 
@@ -179,13 +181,33 @@ project(':tests') {
         integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
     }
 
+    configurations.named('integrationTestRuntimeClasspath') {
+        resolutionStrategy.force libs.hsqldb
+    }
+
+    tasks.register('prepareEmbeddedContainer', Sync) {
+        dependsOn tasks.named('integrationTestClasses')
+
+        from project(':annotation').sourceSets.main.output
+        from project(':shared').sourceSets.main.output
+        from project(':client').sourceSets.main.output
+        from project(':server').sourceSets.main.output
+        from project(':aspect').sourceSets.main.output
+        from sourceSets.integrationTest.output
+        from('src/embedded')
+        into embeddedModule
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
     dependencies {
         testImplementation 'junit:junit:4.13.2'
-        testImplementation 'org.hsqldb:hsqldb:1.8.0.10'
+        integrationTestImplementation(
+                "org.hsqldb:hsqldb:${libs.versions.hsqldb.get()}:jdk8")
         testImplementation libs.commons.jxpath
         testImplementation libs.commons.validator
         testImplementation libs.javax.persistence.api
         testImplementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
+        integrationTestImplementation libs.tomee.embedded.core
         testImplementation project(':shared')
         testImplementation project(':client')
         testImplementation project(':server')
@@ -193,17 +215,21 @@ project(':tests') {
     }
 
     tasks.register('integrationTest', Test) {
-        description = 'Runs tests that require AspectWerkz weaving and the legacy integration environment.'
+        description = 'Runs the embedded-container and non-weaving integration tests.'
         group = 'verification'
-        testClassesDirs = sourceSets.integrationTest.output.classesDirs
-        classpath = sourceSets.integrationTest.runtimeClasspath
+        testClassesDirs = files(embeddedModule)
+        classpath = files(embeddedModule) + sourceSets.integrationTest.runtimeClasspath
+        systemProperty 'genesis.embedded.module', embeddedModule.get().asFile.absolutePath
+        include '**/EmbeddedContainerSmokeTest.class'
+        include '**/AnnotatedMethodTest.class'
+        include '**/BigDecimalConverterTest.class'
+        include '**/BundleTest.class'
+        include '**/ListPagerTest.class'
         useJUnit()
-        dependsOn tasks.named('integrationTestClasses')
-        onlyIf { project.hasProperty('runIntegrationTests') }
+        dependsOn tasks.named('prepareEmbeddedContainer')
     }
 
     tasks.named('check') {
-        dependsOn tasks.named('integrationTestClasses')
         dependsOn tasks.named('integrationTest')
     }
 }

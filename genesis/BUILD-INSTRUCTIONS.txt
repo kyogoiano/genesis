@@ -6,17 +6,26 @@ The production modules target Java 8 bytecode. Run these commands from the
 
    ./gradlew build
 
-`./gradlew build` runs the client module's unit tests and compiles the dedicated
-tests module's integration-test sources. To run only the client tests:
+`./gradlew build` runs the client module's unit tests, compiles all dedicated
+integration-test sources, and runs the embedded-container integration-test
+subset. To run only the client tests:
 
    ./gradlew :client:test
 
 The client tests include Swing tests and therefore need a working graphical
-environment. The dedicated tests module still depends on the historical
-AspectWerkz weaving, generated test resources, and JBoss deployment steps;
-Gradle currently compiles these tests but does not reproduce those setup steps
-or run them as part of the build. Use the legacy Ant integration-test targets
-for execution until that runtime setup is migrated.
+environment. The tests module uses embedded Apache OpenEJB 8.0.16, which runs
+on Java 8 and supports the project's EJB 2.x home interfaces. Run its selected
+integration tests with:
+
+   ./gradlew :tests:integrationTest
+
+The current task runs the embedded EJB smoke test and non-weaving tests for
+annotations, paging, converters, and bundles. All integration sources compile,
+but the full legacy suite is not yet enabled: it needs AspectWerkz bytecode
+weaving, and the 2.1 compiler fails on this project. The proposed
+`org.codehaus.aspectwerkz:aspectwerkz:2.2.2` and `2.2.3` artifacts are not
+available from Maven Central. Tests requiring those aspects remain excluded
+until a compatible weaver is selected.
 
 Dependencies are resolved from Maven Central except the historical
 `reusable-components-20060810.jar` and the XDoclet generator, which remain local

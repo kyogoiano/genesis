@@ -18,6 +18,10 @@
  */
 package net.java.dev.genesis.tests;
 
+import java.io.File;
+import java.util.Properties;
+import javax.naming.Context;
+import javax.ejb.embeddable.EJBContainer;
 import java.util.Map;
 import net.java.dev.genesis.ui.metadata.ViewMetadata;
 import net.java.dev.genesis.ui.metadata.ViewMetadataFactory;
@@ -39,6 +43,22 @@ public class TestCase extends junit.framework.TestCase {
             new PropertyUtilsBean()));
       System.setProperty(JXPathContextFactory.FACTORY_NAME_PROPERTY,
             "net.java.dev.genesis.commons.jxpath.JXPathContextFactory");
+      System.setProperty(Context.INITIAL_CONTEXT_FACTORY,
+            "org.apache.openejb.client.LocalInitialContextFactory");
+
+      String modulePath = System.getProperty("genesis.embedded.module");
+      if (modulePath == null) {
+         throw new IllegalStateException("genesis.embedded.module is not configured");
+      }
+
+      Properties properties = new Properties();
+      properties.put(EJBContainer.MODULES, new File(modulePath));
+      final EJBContainer container = EJBContainer.createEJBContainer(properties);
+      Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+         public void run() {
+            container.close();
+         }
+      }));
    }
 
 	protected FormMetadata getFormMetadata(final Object form) {

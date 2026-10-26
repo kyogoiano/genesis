@@ -6,6 +6,8 @@ commons-validator = "1.11.0"
 taglibs = "1.2.5"
 hibernate = "5.6.15.Final"
 javax-persistence = "2.2"
+tomee = "8.0.16"
+hsqldb = "2.6.1"
 
 [libraries]
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "beanutils" }
@@ -16,3 +18,5 @@ taglibs-standard-impl = { module = "org.apache.taglibs:taglibs-standard-impl", v
 taglibs-standard-spec = { module = "org.apache.taglibs:taglibs-standard-spec", version.ref = "taglibs" }
 hibernate-core = { module = "org.hibernate:hibernate-core", version.ref = "hibernate" }
 javax-persistence-api = { module = "javax.persistence:javax.persistence-api", version.ref = "javax-persistence" }
+tomee-embedded-core = { module = "org.apache.tomee:openejb-core", version.ref = "tomee" }
+hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
