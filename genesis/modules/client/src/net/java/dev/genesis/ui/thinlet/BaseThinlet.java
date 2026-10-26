@@ -123,7 +123,6 @@ public abstract class BaseThinlet extends Thinlet implements
       }
 
       protected ScreenHandler(String fileName) throws ScreenNotFoundException {
-         setAllI18n(true);
          setResourceBundle(UIUtils.getInstance().getBundle());
          parseAndSet(fileName, this);
       }

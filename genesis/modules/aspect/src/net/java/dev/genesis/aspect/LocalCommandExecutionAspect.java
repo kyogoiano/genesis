@@ -48,7 +48,7 @@ public class LocalCommandExecutionAspect extends CommandInvocationAspect {
                ctx.getParameter("transactionalInjector"), true, // NOI18N
                currentThread.getContextClassLoader()).newInstance();
 
-         if (!ctx.isPrototype()) {
+         if (!isPrototype(ctx)) {
             injector.init(ctx);
          }
 

@@ -47,7 +47,7 @@ public class EJBCommandExecutionAspect extends CommandInvocationAspect {
 
    public EJBCommandExecutionAspect(final AspectContext ctx) {
       super(ctx);
-      if (!ctx.isPrototype()) {
+      if (!isPrototype(ctx)) {
          retryOnNoSuchObject = !"false".equals(ctx // NOI18N
                .getParameter("retryOnNoSuchObject")); // NOI18N
       }

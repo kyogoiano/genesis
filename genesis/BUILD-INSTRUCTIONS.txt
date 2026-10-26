@@ -1,13 +1,28 @@
 ## Gradle build
 
-The production modules are built with Gradle and target Java 8. Run these
-commands from the `genesis` directory:
+The production modules are built with Gradle and target Java 8 bytecode. Run
+these commands from the `genesis` directory:
 
    gradle build
 
-The build uses the dependency JARs under `lib/` and the XDoclet JARs under
-`../xdoclet/dist/` to generate the server EJB interfaces.
+`gradle build` runs the client module's unit tests and compiles the dedicated
+tests module's integration-test sources. To run only the client tests:
+
+   gradle :client:test
+
+The client tests include Swing tests and therefore need a working graphical
+environment. The dedicated tests module still depends on the historical
+AspectWerkz weaving, generated test resources, and JBoss deployment steps;
+Gradle currently compiles these tests but does not reproduce those setup steps
+or run them as part of the build. Use the legacy Ant integration-test targets
+for execution until that runtime setup is migrated.
+
+Dependencies are resolved from Maven Central. The historical
+`reusable-components-20060810.jar` remains under `lib/commons/` because no
+Maven Central artifact provides its classes. XDoclet and its EJB source
+generator are resolved from Maven Central as well.
 
 The old Ant build remains available for legacy test, deployment, and site tasks.
 Those tasks require the external JBoss installation and configuration described
-in the historical Ant instructions.
+in the historical Ant instructions, and continue to use the dependency JARs
+under `lib/` and `../xdoclet/dist/`.
