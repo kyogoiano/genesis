@@ -28,12 +28,11 @@ import net.java.dev.genesis.exception.TimeoutException;
 import net.java.dev.genesis.util.Bundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.aspectwerkz.AspectContext;
-import org.codehaus.aspectwerkz.annotation.Around;
-import org.codehaus.aspectwerkz.annotation.Aspect;
-import org.codehaus.aspectwerkz.joinpoint.StaticJoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 
-@Aspect("perJVM")
+@Aspect
 public class TimeoutAspect {
    private static final Log log = LogFactory.getLog(TimeoutAspect.class);
 
@@ -112,7 +111,7 @@ public class TimeoutAspect {
       private final boolean keepThreadInstance;
       private Throwable throwable;
       private Object returnValue;
-      private StaticJoinPoint jp;
+      private ProceedingJoinPoint jp;
       private Object lock = new Object();
       private boolean started;
       private boolean running;
@@ -124,7 +123,7 @@ public class TimeoutAspect {
          this.keepThreadInstance = keepThreadInstance;
       }
 
-      public void execute(StaticJoinPoint jp, long timeout) {
+      public void execute(ProceedingJoinPoint jp, long timeout) {
          this.jp = jp;
          returnValue = null;
          throwable = null;
@@ -215,10 +214,11 @@ public class TimeoutAspect {
    private final boolean keepThreadInstance;
    private final ThreadLocal threadLocal = new ThreadLocal();
    
-   public TimeoutAspect(final AspectContext ctx) {
-      this.timeout = Long.parseLong(ctx.getParameter("timeout")); // NOI18N
-      this.keepThreadInstance = "true".equals( // NOI18N
-            ctx.getParameter("keepThreadInstance")); // NOI18N
+   public TimeoutAspect() {
+      this.timeout = Long.parseLong(System.getProperty(
+            "genesis.aspect.timeout", "2500"));
+      this.keepThreadInstance = Boolean.parseBoolean(System.getProperty(
+            "genesis.aspect.keepThreadInstance", "true"));
    }
 
    private WorkerThread getWorkerThread() {
@@ -229,8 +229,8 @@ public class TimeoutAspect {
       threadLocal.set(workerThread);
    }
 
-   @Around("timeout")
-   public Object timeoutAdvice(final StaticJoinPoint jp) throws Throwable {
+   @Around("execution(* net.java.dev.genesis.tests..TimeoutTest$*.*(..))")
+   public Object timeoutAdvice(final ProceedingJoinPoint jp) throws Throwable {
       WorkerThread thread = getWorkerThread();
 
       if (thread == null) {

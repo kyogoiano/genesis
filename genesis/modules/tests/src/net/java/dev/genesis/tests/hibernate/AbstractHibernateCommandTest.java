@@ -19,7 +19,6 @@
 package net.java.dev.genesis.tests.hibernate;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +39,7 @@ public class AbstractHibernateCommandTest extends TestCase {
 	actions.insert(2);
 
 	AbstractHibernateCommand command = new AbstractHibernateCommand();
-	assertNotNull(command.executeQuery(Arrays.asList(new Long[] {new Long(1), 
-		new Long(2)})));
+	assertNotNull(command.executeQuery(actions.getPrimaryKeys()));
    }
 
    public static class AbstractHibernateCommand extends 

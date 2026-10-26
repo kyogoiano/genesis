@@ -6,37 +6,32 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.java.dev.genesis.aspect;
 
 import net.java.dev.genesis.ui.controller.DefaultFormControllerFactory;
+import net.java.dev.genesis.ui.controller.FormControllerFactory;
 
-import org.codehaus.aspectwerkz.annotation.Mixin;
-import org.codehaus.aspectwerkz.aspect.management.Mixins;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.DeclareMixin;
 
+@Aspect
 public class FormControllerFactoryAspect {
-   @Mixin(pointcut="formControllerFactoryIntroduction", isTransient=true, deploymentModel="perJVM")
-   public static class AspectFormControllerFactory extends DefaultFormControllerFactory {
-      public AspectFormControllerFactory() {
-         String timesAsString = (String) Mixins.getParameters(getClass(),
-               getClass().getClassLoader()).get("maximumEvaluationTimes"); // NOI18N
-
-         if (timesAsString != null) {
-            setMaximumEvaluationTimes(Integer.parseInt(timesAsString));
-         }
-
-         setResetOnDataProviderChange(!"false".equals(Mixins.getParameters( // NOI18N
-               getClass(), getClass().getClassLoader()).get(
-               "resetOnDataProviderChange"))); // NOI18N
+   @DeclareMixin("@net.java.dev.genesis.annotation.Form *")
+   public static FormControllerFactory createFormControllerFactory(Object form) {
+      AspectFormControllerFactory factory = new AspectFormControllerFactory();
+      String times = System.getProperty(
+            "genesis.aspect.maximumEvaluationTimes");
+      if (times != null) {
+         factory.setMaximumEvaluationTimes(Integer.parseInt(times));
       }
+      factory.setResetOnDataProviderChange(!"false".equals(
+            System.getProperty("genesis.aspect.resetOnDataProviderChange",
+                  "true")));
+      return factory;
+   }
+
+   private static class AspectFormControllerFactory
+         extends DefaultFormControllerFactory {
    }
 }

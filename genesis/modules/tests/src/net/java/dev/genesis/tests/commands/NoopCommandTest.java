@@ -55,7 +55,8 @@ public class NoopCommandTest extends TestCase {
         @Remotable
         public int remotable() throws Exception {
             value++;
-            return ((UserTransaction) new InitialContext().lookup("UserTransaction")).getStatus();
+            return ((UserTransaction) new InitialContext().lookup(
+                  "java:comp/UserTransaction")).getStatus();
         }
 
         public void local() {
@@ -65,7 +66,8 @@ public class NoopCommandTest extends TestCase {
         @Transactional
         public int transactional() throws Exception {
             value++;
-            return ((UserTransaction) new InitialContext().lookup("UserTransaction")).getStatus();
+            return ((UserTransaction) new InitialContext().lookup(
+                  "java:comp/UserTransaction")).getStatus();
         }
     }
 }

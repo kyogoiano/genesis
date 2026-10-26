@@ -2,22 +2,19 @@ plugins {
     id 'base'
 }
 
+configurations {
+    aspectjTools
+}
+
+dependencies {
+    aspectjTools libs.aspectj.tools
+}
+
 group = 'net.java.dev.genesis'
 version = '3.3'
 
 allprojects {
     repositories {
-        // AspectWerkz 2.1's published POM group differs from its Central path.
-        maven {
-            url = uri('https://repo.maven.apache.org/maven2')
-            content {
-                includeModule('org.codehaus', 'aspectwerkz-nodeps-jdk5')
-                includeModule('org.codehaus', 'aspectwerkz-jdk5')
-            }
-            metadataSources {
-                artifact()
-            }
-        }
         mavenCentral()
     }
 }
@@ -138,6 +135,8 @@ project(':client') {
         implementation 'rhino:js:1.7R2'
         implementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
         testImplementation 'junit:junit:4.13.2'
+        testRuntimeOnly libs.aspectj.runtime
+        testRuntimeOnly files(project(':aspect').sourceSets.main.output.classesDirs)
     }
 }
 
@@ -149,9 +148,7 @@ project(':aspect') {
         implementation project(':shared')
         implementation project(':server')
         implementation project(':client')
-        implementation 'org.codehaus:aspectwerkz-nodeps-jdk5:2.1'
-        implementation 'org.codehaus:aspectwerkz-jdk5:2.1'
-        implementation 'backport175:backport175:1.0'
+        api libs.aspectj.runtime
         implementation 'javax.ejb:ejb-api:3.0'
     }
 }
@@ -215,16 +212,13 @@ project(':tests') {
     }
 
     tasks.register('integrationTest', Test) {
-        description = 'Runs the embedded-container and non-weaving integration tests.'
+        description = 'Runs the complete integration suite in the embedded EJB container.'
         group = 'verification'
         testClassesDirs = files(embeddedModule)
         classpath = files(embeddedModule) + sourceSets.integrationTest.runtimeClasspath
         systemProperty 'genesis.embedded.module', embeddedModule.get().asFile.absolutePath
-        include '**/EmbeddedContainerSmokeTest.class'
-        include '**/AnnotatedMethodTest.class'
-        include '**/BigDecimalConverterTest.class'
-        include '**/BundleTest.class'
-        include '**/ListPagerTest.class'
+        exclude '**/TestCase.class'
+        exclude '**/ValidatorTest.class'
         useJUnit()
         dependsOn tasks.named('prepareEmbeddedContainer')
     }
@@ -236,4 +230,117 @@ project(':tests') {
 
 tasks.named('build') {
     dependsOn subprojects.collect { it.tasks.named('build') }
+}
+
+def aspectjWeaving = tasks.register('weaveAspectJ') {
+    group = 'build'
+    description = 'Post-compile weaves the Genesis AspectJ aspects into project classes.'
+    outputs.upToDateWhen { false }
+
+    def compilationTasks = []
+    subprojects.each { subproject ->
+        subproject.sourceSets.each { sourceSet ->
+            def compileTask = subproject.tasks.findByName(sourceSet.getCompileTaskName('java'))
+            if (compileTask != null) {
+                compilationTasks.add(compileTask)
+            }
+        }
+    }
+    dependsOn compilationTasks
+
+    doLast {
+        def aspectClasses = project(':aspect').sourceSets.main.output.classesDirs.singleFile
+        if (!aspectClasses.exists()) {
+            throw new GradleException("AspectJ aspects were not compiled: ${aspectClasses}")
+        }
+
+        def classpathFiles = new LinkedHashSet<File>()
+        subprojects.each { subproject ->
+            subproject.sourceSets.each { sourceSet ->
+                classpathFiles.addAll(sourceSet.output.classesDirs.files)
+                classpathFiles.addAll(sourceSet.compileClasspath.files.findAll {
+                    !it.name.startsWith('genesis-')
+                })
+            }
+        }
+        classpathFiles.addAll(configurations.aspectjTools.files)
+
+        def weaveOutput = { subproject, sourceSet, classDirectory ->
+            if (!classDirectory.exists() || !classDirectory.listFiles()?.any {
+                it.name.endsWith('.class') || it.isDirectory()
+            }) {
+                return
+            }
+
+            def wovenDirectory = layout.buildDirectory.dir(
+                    "aspectj-woven/${subproject.name}/${sourceSet.name}").get().asFile
+            delete wovenDirectory
+            wovenDirectory.mkdirs()
+
+            javaexec {
+                classpath = configurations.aspectjTools
+                mainClass = 'org.aspectj.tools.ajc.Main'
+                args '-inpath', classDirectory.absolutePath,
+                        '-aspectpath', aspectClasses.absolutePath,
+                        '-classpath', classpathFiles.collect { it.absolutePath }
+                                .join(File.pathSeparator),
+                        '-d', wovenDirectory.absolutePath,
+                        '-Xlint:ignore'
+            }
+
+            delete classDirectory
+            copy {
+                from wovenDirectory
+                into classDirectory
+            }
+            delete wovenDirectory
+        }
+
+        project(':aspect').sourceSets.main.output.classesDirs.files.each {
+            weaveOutput(project(':aspect'), project(':aspect').sourceSets.main, it)
+        }
+
+        subprojects.findAll { it.name != 'aspect' }.each { subproject ->
+            subproject.sourceSets.each { sourceSet ->
+                sourceSet.output.classesDirs.files.each { classDirectory ->
+                    weaveOutput(subproject, sourceSet, classDirectory)
+                }
+            }
+
+            def thinletJar = project(':client').sourceSets.main.compileClasspath.files
+                    .find { it.name.startsWith('thinlet-') && it.name.endsWith('.jar') }
+            if (thinletJar == null) {
+                throw new GradleException('Thinlet dependency was not found for AspectJ weaving')
+            }
+            def wovenThinlet = layout.buildDirectory.dir(
+                    'aspectj-woven/dependencies/thinlet').get().asFile
+            delete wovenThinlet
+            wovenThinlet.mkdirs()
+            javaexec {
+                classpath = configurations.aspectjTools
+                mainClass = 'org.aspectj.tools.ajc.Main'
+                args '-inpath', thinletJar.absolutePath,
+                        '-aspectpath', aspectClasses.absolutePath,
+                        '-classpath', (classpathFiles + thinletJar)
+                                .collect { it.absolutePath }.join(File.pathSeparator),
+                        '-d', wovenThinlet.absolutePath,
+                        '-Xlint:ignore'
+            }
+        }
+    }
+}
+
+subprojects {
+    tasks.withType(Test).configureEach {
+        dependsOn aspectjWeaving
+        classpath = files(rootProject.layout.buildDirectory.dir(
+                'aspectj-woven/dependencies/thinlet')) + classpath
+    }
+
+    project(':tests').tasks.named('prepareEmbeddedContainer').configure {
+        dependsOn aspectjWeaving
+    }
+    tasks.named('jar').configure {
+        dependsOn aspectjWeaving
+    }
 }

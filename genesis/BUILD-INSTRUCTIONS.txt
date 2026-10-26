@@ -7,8 +7,8 @@ The production modules target Java 8 bytecode. Run these commands from the
    ./gradlew build
 
 `./gradlew build` runs the client module's unit tests, compiles all dedicated
-integration-test sources, and runs the embedded-container integration-test
-subset. To run only the client tests:
+integration-test sources, and runs the embedded-container integration tests.
+To run only the client tests:
 
    ./gradlew :client:test
 
@@ -19,13 +19,11 @@ integration tests with:
 
    ./gradlew :tests:integrationTest
 
-The current task runs the embedded EJB smoke test and non-weaving tests for
-annotations, paging, converters, and bundles. All integration sources compile,
-but the full legacy suite is not yet enabled: it needs AspectWerkz bytecode
-weaving, and the 2.1 compiler fails on this project. The proposed
-`org.codehaus.aspectwerkz:aspectwerkz:2.2.2` and `2.2.3` artifacts are not
-available from Maven Central. Tests requiring those aspects remain excluded
-until a compatible weaver is selected.
+The integration test build uses AspectJ 1.9.7 for post-compile weaving. The
+weaver processes the project classes and Thinlet dependency before tests run.
+The version is selected because it can run on Java 8. The test task excludes
+the abstract `TestCase` helper and `ValidatorTest`; the latter requires a
+`validation.xml` fixture that is not present in the repository.
 
 Dependencies are resolved from Maven Central except the historical
 `reusable-components-20060810.jar` and the XDoclet generator, which remain local
@@ -34,14 +32,14 @@ existing Ant `server:ejbdoclet` target to generate EJB interfaces. The refreshed
 Commons and Taglibs dependency versions are centralized in
 `gradle/libs.versions.toml` and shared between production and test configurations.
 Hibernate is upgraded to 5.6.15.Final, with the matching `javax.persistence`
-2.2 API. Its legacy Criteria API remains in use as a compatibility bridge;
-the dedicated Hibernate tests compile, but running them still requires the
-legacy integration-test runtime setup described above.
+2.2 API. Its legacy Criteria API remains in use as a compatibility bridge.
 
-The old Ant build remains available for legacy test, deployment, and site tasks.
-Those tasks require the external JBoss installation and configuration described
-in the historical Ant instructions, and continue to use the dependency JARs
-under `lib/` and `../xdoclet/dist/`.
+Ant remains available for EJB source generation and other non-aspect legacy
+tasks. Its old aspect compilation, annotation preprocessing, weaving, and test
+workflows now fail fast with guidance to use Gradle. AspectJ compilation,
+weaving, packaging, and tests are handled by Gradle. The legacy sample-project
+Ant templates remain for reference, but their aspect-dependent build and
+deployment flows are retired.
 
 The Ant build files are retained because `build.xml` provides EJB generation
 and legacy targets, `build_dist.xml` assembles the distribution, and

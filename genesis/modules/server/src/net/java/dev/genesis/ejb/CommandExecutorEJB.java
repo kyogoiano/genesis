@@ -27,6 +27,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import net.java.dev.genesis.command.TransactionalInjector;
+import net.java.dev.genesis.command.CommandExecutionGuard;
 import net.java.dev.genesis.reflection.ReflectionInvoker;
 
 /**
@@ -100,8 +101,14 @@ public class CommandExecutorEJB implements SessionBean {
       try {
          injector.beforeInvocation(o, transactional);
 
-         final Object ret =  ReflectionInvoker.getInstance().invoke(o, methodName,
-               classNames, args);
+         final Object ret;
+         CommandExecutionGuard.enter();
+         try {
+            ret = ReflectionInvoker.getInstance().invoke(o, methodName,
+                  classNames, args);
+         } finally {
+            CommandExecutionGuard.exit();
+         }
          
          injector.afterInvocation();
 

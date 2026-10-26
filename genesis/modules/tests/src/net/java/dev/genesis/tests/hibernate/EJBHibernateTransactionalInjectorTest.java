@@ -24,6 +24,7 @@ import net.java.dev.genesis.annotation.Remotable;
 import net.java.dev.genesis.annotation.Transactional;
 import net.java.dev.genesis.command.hibernate.AbstractHibernateCommand;
 import net.java.dev.genesis.tests.TestCase;
+import org.hibernate.Hibernate;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 
@@ -106,10 +107,11 @@ public class EJBHibernateTransactionalInjectorTest extends TestCase {
       }
 
       @Remotable
-
       public HibernateBean getNonExistentBean(Class clazz) throws Exception {
-         return (HibernateBean) getSession().load(clazz,
+         HibernateBean bean = (HibernateBean)getSession().load(clazz,
                new Long(Long.MIN_VALUE));
+         Hibernate.initialize(bean);
+         return bean;
       }
 
       @Remotable
@@ -144,8 +146,7 @@ public class EJBHibernateTransactionalInjectorTest extends TestCase {
 
       @Transactional
       public void deleteAll() throws Exception {
-          HibernateBean bean = new HibernateBean();
-          getSession().delete("from HibernateBean", bean);
+          getSession().createQuery("delete from HibernateBean").executeUpdate();
       }
    }
 }

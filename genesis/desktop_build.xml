@@ -169,7 +169,6 @@
 
       <path id="client.standard.javac.classpath">
          <path location="${shared.classes.dir}" />
-         <path refid="aspectwerkz.path" />
          <fileset dir="${genesis.dist}">
             <include name="${genesis-annotation.jar}" />
             <include name="genesis-shared-${genesis.version}.jar" />
@@ -233,19 +232,12 @@
    </target>
 
    <target name="-do-client-annotations">
-      <genesis:annotationc srcdir="${client.sources.dir}" 
-                           destdir="${client.annotated.dir}"
-                           classpath="${client.classes.dir}"
-                           touchfile="${client.annotated.timestamp.file}">
-         <additional-classpath>
-            <path location="${shared.annotated.dir}" />
-         </additional-classpath>
-      </genesis:annotationc>
+      <fail message="Legacy annotation preprocessing is retired. Use the Gradle AspectJ build." />
    </target>
 
    <target name="client:annotations" if="client.annotationc.tasks.needed"
-           depends="client:check-annotations-needed,define-aw-macros,define-call-task">
-      <genesis:call target="-do-client-annotations" />
+           depends="client:check-annotations-needed">
+      <fail message="Legacy annotation preprocessing is retired. Use the Gradle AspectJ build." />
    </target>
 
    <target name="client:pre-check-validation-conditions">
@@ -381,14 +373,12 @@
       </condition>
 
       <path id="weaving.standard.local.classpath">
-         <path path="${genesis.dist}/genesis-aspect-annotated-${genesis.version}.jar" />
          <path refid="client.javac.classpath" />
          <path refid="shared.javac.classpath" />
          <path refid="j2ee.path" />
       </path>
 
       <path id="weaving.standard.remote.classpath">
-         <path path="${genesis.dist}/genesis-aspect-annotated-${genesis.version}.jar" />
          <path refid="client.javac.classpath" />
          <path refid="shared.javac.classpath" />
          <path refid="j2ee.path" />
@@ -652,13 +642,8 @@
    </target>
 
    <target name="weaving:local" 
-           depends="weaving:define-local-classpath,weaving:copy-local-files,
-                    define-aw-macros"
            if="weaving.local.needed">
-      <genesis:awc classpath="weaving.local.classpath" 
-                   sourcepath="${preweaving.local.dir}"
-                   destdir="${weaving.local.dir}"
-                   touchfile="${weaving.local.timestamp.file}" />
+      <fail message="Ant weaving is retired. Use the Gradle AspectJ build." />
    </target>
 
    <target name="-do-weaving-copy-remote-files">
@@ -673,17 +658,13 @@
    </target>
 
    <target name="weaving:remote" 
-           depends="weaving:define-remote-classpath,weaving:copy-remote-files,
-                    define-aw-macros"
            if="weaving.remote.needed">
-      <genesis:awc classpath="weaving.remote.classpath" 
-                   sourcepath="${preweaving.remote.dir}"
-                   destdir="${weaving.remote.dir}"
-                   touchfile="${weaving.remote.timestamp.file}" />
+      <fail message="Ant weaving is retired. Use the Gradle AspectJ build." />
    </target>
 
-   <target name="weaving" 
-           depends="weaving:local,weaving:remote,-do-custom-weaving" />
+   <target name="weaving">
+      <fail message="Ant weaving is retired. Use the Gradle AspectJ build." />
+   </target>
 
    <target name="run:pre-init">
       <!-- Override to define any properties that shouldn't be redefined by 
@@ -719,17 +700,10 @@
          <path refid="backport175.path" />
          <fileset dir="${genesis.dist}">
             <include name="${genesis-annotation.jar}" />
-            <include name="genesis-aspect-annotated-*.jar" />
             <include name="genesis-client-${genesis.version}.jar" />
             <include name="genesis-client-swing-${genesis.version}.jar" if="swing.needed" />
             <include name="genesis-client-swt-${genesis.version}.jar" if="swt.needed" />
             <include name="genesis-client-thinlet-${genesis.version}.jar" if="thinlet.needed" />
-         </fileset>
-         <fileset dir="${aspectwerkz.dist}">
-            <include name="aspectwerkz-*.jar" />
-            <include name="dom4j-*.jar" />
-            <include name="jrexx-*.jar" />
-            <include name="trove-*.jar" />
          </fileset>
          <fileset dir="${hibernate.dist}">
             <include name="hibernate3.jar" if="hibernate3.needed" />
@@ -1417,7 +1391,6 @@
                   <include name="genesis-client-swing-${genesis.version}.jar" if="swing.needed" />
                   <include name="genesis-client-swt-${genesis.version}.jar" if="swt.needed" />
                   <include name="genesis-client-thinlet-${genesis.version}.jar" if="thinlet.needed" />
-                  <include name="genesis-aspect-annotated-${genesis.version}.jar" />
                </fileset>
                <fileset dir="${commons.dist}">
                   <include name="commons-beanutils*.jar"/>
@@ -1425,12 +1398,6 @@
                   <include name="commons-digester*.jar"/>
                   <include name="commons-validator*.jar"/>
                   <include name="reusable-components*.jar"/>
-               </fileset>
-               <fileset dir="${aspectwerkz.dist}">
-                  <include name="aspectwerkz-*.jar" />
-                  <include name="dom4j*.jar" />
-                  <include name="jrexx-*.jar" />
-                  <include name="trove*.jar" />
                </fileset>
                <fileset dir="${backport175.dist}">
                   <include name="backport175-*.jar" />

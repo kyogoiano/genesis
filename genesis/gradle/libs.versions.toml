@@ -8,6 +8,7 @@ hibernate = "5.6.15.Final"
 javax-persistence = "2.2"
 tomee = "8.0.16"
 hsqldb = "2.6.1"
+aspectj = "1.9.7"
 
 [libraries]
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "beanutils" }
@@ -20,3 +21,5 @@ hibernate-core = { module = "org.hibernate:hibernate-core", version.ref = "hiber
 javax-persistence-api = { module = "javax.persistence:javax.persistence-api", version.ref = "javax-persistence" }
 tomee-embedded-core = { module = "org.apache.tomee:openejb-core", version.ref = "tomee" }
 hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
+aspectj-runtime = { module = "org.aspectj:aspectjrt", version.ref = "aspectj" }
+aspectj-tools = { module = "org.aspectj:aspectjtools", version.ref = "aspectj" }

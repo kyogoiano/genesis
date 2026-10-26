@@ -21,26 +21,8 @@
       <fileset dir="${genesis.backport175.dist}" />
    </path>
 
-   <path id="aspectwerkz.path">
-      <fileset dir="${genesis.aspectwerkz.dist}">
-         <include name="aspectwerkz*.jar"/>
-         <exclude name="aspectwerkz-extensions-*.jar" />
-         <exclude name="asm*.jar"/>
-         <include name="concurrent*.jar"/>
-         <include name="dom4j*.jar"/>
-         <include name="javassist*.jar"/>
-         <include name="jrexx*.jar"/>
-         <include name="junit*.jar"/>
-         <include name="managementapi*.jar"/>
-         <include name="piccolo*.jar"/>
-         <include name="qdox*.jar"/>
-         <include name="trove*.jar"/>
-      </fileset>
-   </path>
-
    <path id="anttasks.path">
       <path refid="backport175.path" />
-      <path refid="aspectwerkz.path" />
       <fileset dir="${genesis.anttasks.dist}" />
    </path>
 
@@ -74,7 +56,6 @@
 	</path>
 
 	<path id="shared.dependency.classpath">
-      <fileset dir="${genesis.aspectwerkz.dist}" includes="aspectwerkz-*.jar" />
       <fileset dir="${genesis.hibernate.dist}" includes="hibernate*.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="commons-beanutils*.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="commons-logging*.jar" />
@@ -103,7 +84,6 @@
 
    <path id="client.tests.dependency.classpath">
       <path refid="client.dependency.classpath" />
-      <fileset dir="${genesis.aspectwerkz.dist}" includes="junit-*.jar" />
       <path location="${genesis.module.client}/${build.dest}" />
 		<fileset dir="${genesis.hibernate.dist}" includes="hibernate*.jar" />
    </path>
@@ -113,7 +93,6 @@
       <path location="${genesis.module.annotation}/${build.dest}" />
 		<path location="${genesis.module.shared}/${build.dest}" />
 		<path location="${genesis.module.client}/${build.dest}" />
-		<fileset dir="${genesis.aspectwerkz.dist}" includes="aspectwerkz*.jar" />
 		<fileset dir="${genesis.hibernate.dist}" includes="hibernate*.jar" />
 		<fileset dir="${genesis.j2ee.dist}" includes="jboss-j2ee.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="commons-beanutils*.jar" />
@@ -132,8 +111,6 @@
       <path location="${genesis.module.annotation}/${build.dest}" />
 		<path location="${genesis.module.client}/${build.dest}" />
       <path refid="script.path" />
-		<fileset dir="${genesis.aspectwerkz.dist}" includes="aspectwerkz*.jar" />
-		<fileset dir="${genesis.aspectwerkz.dist}" includes="junit*.jar" />
 		<fileset dir="${genesis.hibernate.dist}" includes="hibernate*.jar, ejb3-*.jar" />
 		<fileset dir="${genesis.j2ee.dist}" includes="jboss-j2ee.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="commons-beanutils*.jar" />
@@ -145,7 +122,6 @@
 
 	</path>
 
-   <taskdef name="awc" classname="org.codehaus.aspectwerkz.compiler.AspectWerkzCTask" classpathref="aspectwerkz.path" />
    <taskdef name="ejbdoclet" classname="xdoclet.modules.ejb.EjbDocletTask" classpathref="xdoclet.path" />
    <taskdef name="genesisdoclet" classname="xdoclet.modules.genesis.GenesisDocletTask" classpathref="xdoclet.path" />
    <taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="xdoclet.path" />
@@ -281,40 +257,13 @@
       </jar>
 	</target>
 
-	<target name="aspect:compile">
-		<mkdir dir="${genesis.module.aspect}/${build.dest}" />
-		<javac destdir="${genesis.module.aspect}/${build.dest}"
-		       debug="true"
-		       source="1.8"
-		       target="1.8"
-		       classpathref="aspect.dependency.classpath"
-               includeantruntime="false">
-			<src path="${genesis.module.aspect}/${src.dir}" />
-		</javac>
-		<antcall target="aspect:resources" />
-	</target>
+   <target name="aspect:compile">
+      <fail message="The Ant aspect module is retired. Use the Gradle AspectJ build." />
+   </target>
 
-
-	<target name="aspect:resources">
-		<copy todir="${genesis.module.aspect}/${build.dest}" overwrite="true">
-			<fileset dir="${genesis.module.aspect}/${src.dir}">
-				<include name="**/*.properties" />
-			</fileset>
-		</copy>
-	</target>
-
-	<target name="aspect:jar">
-		<mkdir dir="${genesis.dist.dir}" />
-		<jar destfile="${genesis.dist.dir}/genesis-aspect-${genesis.version}.jar">
-			<fileset dir="${genesis.module.aspect}/${build.dest}" />
-		</jar>
-		<jar destfile="${genesis.dist.dir}/genesis-aspect-annotated-${genesis.version}.jar">
-			<fileset dir="${genesis.module.aspect}/${build.dest}" />
-		</jar>
-      <copy todir="${genesis.dist.dir}">
-         <fileset dir="${genesis.module.aspect}/${src.dir}" includes="annotation.properties" />
-      </copy>    
-	</target>
+   <target name="aspect:jar">
+      <fail message="The Ant aspect module is retired. Use the Gradle AspectJ build." />
+   </target>
 
    <target name="annotation:compile">
       <mkdir dir="${genesis.module.annotation}/${build.dest}" />
@@ -355,19 +304,8 @@
 		</jar>
 	</target>
    
-   <target name="integrationtest:compile" depends="integrationtest:hibernatedoclet,integrationtest:webdoclet">
-      <mkdir dir="${genesis.module.tests}/${test.dest}" />
-      <javac destdir="${genesis.module.tests}/${test.dest}"
-                debug="true"
-                source="1.8"
-                target="1.8"
-                classpathref="tests.dependency.classpath"
-                executable="${javac.compiler}"
-                includeantruntime="false">
-         <src path="${genesis.module.tests}/${src.dir}" />
-      </javac>
-      <antcall target="integrationtest:resources" />
-      <antcall target="integrationtest:weaving" />
+   <target name="integrationtest:compile">
+      <fail message="Ant integration tests are retired. Run :tests:integrationTest with Gradle." />
    </target>
 
 
@@ -410,20 +348,7 @@
 
 
 	<target name="integrationtest:weaving">
-		<mkdir dir="${genesis.module.tests}/${genesis.weaving.dest}" />
-		<unjar dest="${genesis.module.tests}/${genesis.weaving.dest}" overwrite="true">
-			<fileset dir="${genesis.thinlet.dist}" includes="thinlet*.jar" />
-		</unjar>
-		<copy todir="${genesis.module.tests}/${genesis.weaving.dest}" overwrite="true">
-			<fileset dir="${genesis.module.aspect}/${build.dest}" />
-			<fileset dir="${genesis.module.client}/${build.dest}" />
-			<fileset dir="${genesis.module.shared}/${build.dest}" />
-			<fileset dir="${genesis.module.tests}/${test.dest}" />
-		</copy>
-      <awc verbose="true"
-            definition="${genesis.module.tests}/${src.dir}/aspectwerkz.xml"
-            classpathref="tests.dependency.classpath"
-            targetpath="${genesis.module.tests}/${genesis.weaving.dest}" />
+      <fail message="Ant integration-test weaving is retired. Run :tests:integrationTest with Gradle." />
 	</target>
 
 	<target name="integrationtest:resources">
@@ -455,6 +380,7 @@
    </target>
 
    <target name="integrationtest:deploy">
+      <fail message="Ant integration-test deployment is retired. Run :tests:integrationTest with Gradle." />
       <available type="dir" file="${jboss.app}" property="app.dir.exists" />
       <antcall target="integrationtest:create.jboss.app.dir"/>
       <mkdir dir="${genesis.jboss.app}/deploy/genesis-tests.sar/META-INF" />
@@ -489,17 +415,15 @@
    </target>
 
 	<target name="integrationtest:test">
+      <fail message="Ant integration tests are retired. Run :tests:integrationTest with Gradle." />
 		<mkdir dir="${genesis.module.tests}/${test.reportsDirectory}" />
 		<junit printsummary="yes" fork="yes">
          <sysproperty key="java.naming.factory.initial"
 			             value="org.jnp.interfaces.NamingContextFactory" />
 			<sysproperty key="java.naming.provider.url" value="${genesis.jboss.provider.url}" />
-			<sysproperty key="aspectwerkz.definition.file"
-			             value="${basedir}/${genesis.module.tests}/${src.dir}/aspectwerkz.xml" />
 			<formatter type="xml" />
 			<classpath>
             <path refid="backport175.path" />      
-            <path refid="aspectwerkz.path" />
             <path refid="commons.path" />
             <path refid="hibernate.path" />
             <path refid="script.path" />      
@@ -528,6 +452,7 @@
    </target>
 
    <target name="unittest:compile">
+      <fail message="Ant unit tests are retired. Run :client:test with Gradle." />
       <mkdir dir="${genesis.module.client}/${test.dest}" />  
       <javac destdir="${genesis.module.client}/${test.dest}"
              debug="true"
@@ -554,6 +479,7 @@
    </target>
 
    <target name="unittest:test">
+      <fail message="Ant unit tests are retired. Run :client:test with Gradle." />
       <mkdir dir="${genesis.module.client}/${test.reportsDirectory}" />
       <junit printsummary="yes" fork="yes">
          <formatter type="xml" />
@@ -592,17 +518,15 @@
    <target name="test:compile" depends="unittest:compile,integrationtest:compile" />
 
    <target name="test:test">
+      <fail message="Ant tests are retired. Run the Gradle test tasks." />
       <mkdir dir="${genesis.build.dir}/${test.reportsDirectory}" />
       <junit printsummary="yes" fork="yes">
          <sysproperty key="java.naming.factory.initial"
                       value="org.jnp.interfaces.NamingContextFactory" />
          <sysproperty key="java.naming.provider.url" value="${genesis.jboss.provider.url}" />
-         <sysproperty key="aspectwerkz.definition.file"
-                      value="${basedir}/${genesis.module.tests}/${src.dir}/aspectwerkz.xml" />
          <formatter type="xml" />
          <classpath>
             <path refid="backport175.path" />      
-            <path refid="aspectwerkz.path" />
             <path refid="commons.path" />
             <path refid="hibernate.path" />
             <path refid="script.path" />      
