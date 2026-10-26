@@ -5,8 +5,21 @@ plugins {
 group = 'net.java.dev.genesis'
 version = '3.3'
 
-def localJars = { String directory, String pattern = '*.jar' ->
-    fileTree(dir: rootProject.file("lib/${directory}"), include: pattern)
+allprojects {
+    repositories {
+        // AspectWerkz 2.1's published POM group differs from its Central path.
+        maven {
+            url = uri('https://repo.maven.apache.org/maven2')
+            content {
+                includeModule('org.codehaus', 'aspectwerkz-nodeps-jdk5')
+                includeModule('org.codehaus', 'aspectwerkz-jdk5')
+            }
+            metadataSources {
+                artifact()
+            }
+        }
+        mavenCentral()
+    }
 }
 
 subprojects {
@@ -29,7 +42,9 @@ subprojects {
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-        options.release.set(8)
+        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_1_9)) {
+            options.release.set(8)
+        }
     }
 
     tasks.named('jar') {
@@ -43,17 +58,18 @@ project(':shared') {
     sourceSets.main.resources.include('**/Bundle*.properties')
 
     dependencies {
-        api localJars('aspectwerkz', 'aspectwerkz-*.jar')
-        api localJars('hibernate', 'hibernate*.jar')
-        api localJars('commons', 'commons-beanutils*.jar')
-        api localJars('commons', 'commons-logging*.jar')
-        api localJars('commons', 'reusable-components*.jar')
+        api('org.hibernate:hibernate:3.2.7.ga') {
+            exclude group: 'javax.transaction', module: 'jta'
+        }
+        api 'javax.transaction:jta:1.1'
+        api 'commons-beanutils:commons-beanutils:1.9.1'
+        api 'commons-logging:commons-logging:1.1.3'
+        api files(rootProject.file('lib/commons/reusable-components-20060810.jar'))
     }
 }
 
 project(':server') {
     def generatedSources = layout.buildDirectory.dir('generated/sources/xdoclet/main')
-    configurations.create('xdoclet')
 
     sourceSets.main.java.srcDir(generatedSources)
     sourceSets.main.resources.srcDir(generatedSources)
@@ -61,37 +77,33 @@ project(':server') {
 
     dependencies {
         implementation project(':shared')
-        implementation localJars('hibernate', 'hibernate*.jar')
-        implementation localJars('commons', 'commons-logging*.jar')
-        implementation files(rootProject.file('lib/j2ee/jboss-j2ee.jar'))
-        xdoclet fileTree(dir: rootProject.file('../xdoclet/dist'), include: '*.jar')
+        implementation 'javax.ejb:ejb-api:3.0'
     }
 
     tasks.register('generateEjbSources') {
         inputs.files(fileTree('src') { include '**/*EJB.java' })
+        inputs.files(
+                rootProject.file('build.xml'),
+                rootProject.file('build.properties'),
+                rootProject.file('project.properties'),
+                fileTree(rootProject.file('../xdoclet/dist'))
+        )
         outputs.dir(generatedSources)
 
         doLast {
             def destination = generatedSources.get().asFile
+            delete destination
             destination.mkdirs()
 
-            ant.taskdef(
-                    name: 'ejbdoclet',
-                    classname: 'xdoclet.modules.ejb.EjbDocletTask',
-                    classpath: configurations.xdoclet.asPath +
-                            File.pathSeparator + rootProject.file('lib/j2ee/jboss-j2ee.jar')
-            )
-            ant.ejbdoclet(destdir: destination.absolutePath, ejbSpec: '2.1') {
-                fileset(dir: file('src'), includes: '**/*EJB.java')
-                deploymentdescriptor(
-                        destdir: new File(destination, 'META-INF').absolutePath,
-                        validatexml: false,
-                        xmlencoding: 'ISO-8859-1'
+            ant.ant(
+                    antfile: rootProject.file('build.xml'),
+                    target: 'server:ejbdoclet',
+                    dir: rootProject.projectDir
+            ) {
+                property(
+                        name: 'build.src',
+                        value: 'build/generated/sources/xdoclet/main'
                 )
-                homeinterface()
-                localhomeinterface()
-                remoteinterface()
-                localinterface()
             }
         }
     }
@@ -107,17 +119,25 @@ project(':server') {
 project(':client') {
     sourceSets.main.resources.srcDir('src')
     sourceSets.main.resources.include('**/Bundle*.properties')
+    sourceSets.main.resources.include('**/*.xml')
+    sourceSets.test.java.setSrcDirs(['test-src'])
+    sourceSets.test.resources.setSrcDirs(['test-src'])
+    sourceSets.test.resources.include('**/*.properties')
 
     dependencies {
         implementation project(':shared')
         implementation project(':annotation')
-        implementation localJars('script')
-        implementation localJars('backport175')
-        implementation localJars('commons', 'commons-beanutils*.jar')
-        implementation localJars('commons', 'commons-logging*.jar')
-        implementation localJars('commons', 'commons-validator*.jar')
-        implementation localJars('commons', 'reusable-components*.jar')
-        implementation localJars('thinlet', 'thinlet*.jar')
+        implementation 'bsf:bsf:2.4.0'
+        implementation 'org.apache-extras.beanshell:bsh:2.0b5'
+        implementation 'commons-el:commons-el:1.0'
+        implementation 'commons-jxpath:commons-jxpath:1.3'
+        implementation 'commons-validator:commons-validator:1.4.0'
+        implementation 'org.apache.taglibs:taglibs-standard-impl:1.2.1'
+        implementation 'org.apache.taglibs:taglibs-standard-spec:1.2.1'
+        implementation 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.3'
+        implementation 'rhino:js:1.7R2'
+        implementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
+        testImplementation 'junit:junit:4.13.2'
     }
 }
 
@@ -129,21 +149,62 @@ project(':aspect') {
         implementation project(':shared')
         implementation project(':server')
         implementation project(':client')
-        implementation localJars('backport175')
-        implementation localJars('aspectwerkz')
-        implementation localJars('hibernate', 'hibernate*.jar')
-        implementation files(rootProject.file('lib/j2ee/jboss-j2ee.jar'))
-        implementation localJars('commons', 'commons-beanutils*.jar')
-        implementation localJars('commons', 'commons-logging*.jar')
-        implementation localJars('commons', 'reusable-components*.jar')
-        implementation localJars('thinlet', 'thinlet*.jar')
-        implementation localJars('script', 'commons-jxpath*.jar')
+        implementation 'org.codehaus:aspectwerkz-nodeps-jdk5:2.1'
+        implementation 'org.codehaus:aspectwerkz-jdk5:2.1'
+        implementation 'backport175:backport175:1.0'
+        implementation 'javax.ejb:ejb-api:3.0'
     }
 }
 
 project(':container') {
     dependencies {
-        implementation localJars('commons', 'commons-logging*.jar')
+        implementation 'commons-logging:commons-logging:1.1.3'
+    }
+}
+
+project(':tests') {
+    sourceSets.main.java.setSrcDirs([])
+    sourceSets.main.resources.setSrcDirs([])
+
+    sourceSets {
+        integrationTest {
+            java.setSrcDirs(['src'])
+            resources.setSrcDirs(['src'])
+            resources.include('**/*.properties', '**/*.xml')
+        }
+    }
+
+    configurations {
+        integrationTestImplementation.extendsFrom(testImplementation)
+        integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    }
+
+    dependencies {
+        testImplementation 'junit:junit:4.13.2'
+        testImplementation 'org.hsqldb:hsqldb:1.8.0.10'
+        testImplementation 'commons-jxpath:commons-jxpath:1.3'
+        testImplementation 'commons-validator:commons-validator:1.4.0'
+        testImplementation 'javax.persistence:persistence-api:1.0.2'
+        testImplementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
+        testImplementation project(':shared')
+        testImplementation project(':client')
+        testImplementation project(':server')
+        testImplementation project(':aspect')
+    }
+
+    tasks.register('integrationTest', Test) {
+        description = 'Runs tests that require AspectWerkz weaving and the legacy integration environment.'
+        group = 'verification'
+        testClassesDirs = sourceSets.integrationTest.output.classesDirs
+        classpath = sourceSets.integrationTest.runtimeClasspath
+        useJUnit()
+        dependsOn tasks.named('integrationTestClasses')
+        onlyIf { project.hasProperty('runIntegrationTests') }
+    }
+
+    tasks.named('check') {
+        dependsOn tasks.named('integrationTestClasses')
+        dependsOn tasks.named('integrationTest')
     }
 }
 

@@ -37,6 +37,23 @@ public class CommandInvocationAspect {
    public CommandInvocationAspect(AspectContext ctx) {
       this.ctx = ctx;
    }
+
+   protected static boolean isPrototype(AspectContext context) {
+      try {
+         Method method;
+         try {
+            method = context.getClass().getMethod("isPrototype"); // NOI18N
+         } catch (NoSuchMethodException e) {
+            // AspectWerkz 2.1 represents prototypes with no associated object.
+            method = context.getClass().getMethod("getAssociatedObject"); // NOI18N
+            return method.invoke(context) == null;
+         }
+
+         return ((Boolean)method.invoke(context)).booleanValue();
+      } catch (ReflectiveOperationException e) {
+         throw new IllegalStateException("Unable to inspect AspectWerkz context", e); // NOI18N
+      }
+   }
    
    @Mixin(pointcut="commandResolverIntroduction", isTransient=true, deploymentModel="perJVM")
    public static class CommandResolverImpl implements CommandResolver, Serializable {

@@ -1,6 +1,6 @@
 rootProject.name = 'genesis'
 
-include 'annotation', 'shared', 'server', 'client', 'aspect', 'container'
+include 'annotation', 'shared', 'server', 'client', 'aspect', 'container', 'tests'
 
 project(':annotation').projectDir = file('modules/annotation')
 project(':shared').projectDir = file('modules/shared')
@@ -8,3 +8,4 @@ project(':server').projectDir = file('modules/server')
 project(':client').projectDir = file('modules/client')
 project(':aspect').projectDir = file('modules/aspect')
 project(':container').projectDir = file('modules/container')
+project(':tests').projectDir = file('modules/tests')

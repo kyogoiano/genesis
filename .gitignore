@@ -6,3 +6,11 @@
 /genesis/modules/container/build/
 /genesis/modules/server/build/
 /genesis/modules/shared/build/
+/genesis/modules/tests/build/
+/genesis/.gradle/
+/genesis/modules/annotation/target/
+/genesis/modules/aspect/target/
+/genesis/modules/client/target/
+/genesis/modules/container/target/
+/genesis/modules/server/target/
+/genesis/modules/shared/target/

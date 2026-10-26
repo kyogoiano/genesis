@@ -48,6 +48,10 @@ public class ClonerRegistryTest extends GenesisTestCase {
       super("Cloner Registry Unit Test");
    }
 
+   protected void tearDown() throws Exception {
+      ClonerRegistry.getInstance().register(String.class, null);
+   }
+
    public void testGetDefaultEmptyResolverForClass() {
       assertEquals(DefaultCloner.class, ClonerRegistry.getInstance()
             .getDefaultClonerFor(Object.class).getClass());
