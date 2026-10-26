@@ -18,13 +18,9 @@
  */
 package net.java.dev.genesis.hibernate.type;
 
-public class SimNaoType extends org.hibernate.type.CharBooleanType{
-    protected String getTrueString() {
-        return "S"; // NOI18N
+public class SimNaoType extends org.hibernate.type.BooleanType {
+    public SimNaoType() {
+        super(org.hibernate.type.descriptor.sql.CharTypeDescriptor.INSTANCE,
+              new org.hibernate.type.descriptor.java.BooleanTypeDescriptor('S', 'N'));
     }
-    
-    protected String getFalseString() {
-        return "N"; // NOI18N
-    }
-    
 }

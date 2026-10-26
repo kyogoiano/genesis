@@ -58,7 +58,7 @@ project(':shared') {
     sourceSets.main.resources.include('**/Bundle*.properties')
 
     dependencies {
-        api('org.hibernate:hibernate:3.2.7.ga') {
+        api(libs.hibernate.core) {
             exclude group: 'javax.transaction', module: 'jta'
         }
         api 'javax.transaction:jta:1.1'
@@ -184,7 +184,7 @@ project(':tests') {
         testImplementation 'org.hsqldb:hsqldb:1.8.0.10'
         testImplementation libs.commons.jxpath
         testImplementation libs.commons.validator
-        testImplementation 'javax.persistence:persistence-api:1.0.2'
+        testImplementation libs.javax.persistence.api
         testImplementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
         testImplementation project(':shared')
         testImplementation project(':client')

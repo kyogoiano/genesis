@@ -21,6 +21,8 @@ package net.java.dev.genesis.hibernate.type;
 import org.hibernate.MappingException;
 import org.hibernate.type.CustomType;
 import org.hibernate.type.Type;
+import org.hibernate.usertype.ParameterizedType;
+import org.hibernate.usertype.UserType;
 
 import java.util.Properties;
 
@@ -36,7 +38,24 @@ public class HibernateTypeValue {
 
    public HibernateTypeValue(Object value, Class typeValue, Properties parameters)
          throws MappingException {
-      this(value, new CustomType(typeValue, parameters));
+      this(value, createCustomType(typeValue, parameters));
+   }
+
+   private static Type createCustomType(Class typeValue, Properties parameters)
+         throws MappingException {
+      try {
+         UserType userType = (UserType) typeValue.newInstance();
+         if (userType instanceof ParameterizedType) {
+            ((ParameterizedType) userType).setParameterValues(parameters);
+         }
+         return new CustomType(userType);
+      } catch (InstantiationException e) {
+         throw new MappingException("Could not instantiate user type " + typeValue, e);
+      } catch (IllegalAccessException e) {
+         throw new MappingException("Could not access user type " + typeValue, e);
+      } catch (ClassCastException e) {
+         throw new MappingException("Type does not implement UserType: " + typeValue, e);
+      }
    }
 
    public Type getType() {

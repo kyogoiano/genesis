@@ -99,7 +99,7 @@ public class LocalCommandExecutionTest extends TestCase {
         @Remotable
         public Session remotable() {
             value++;
-            flushMode = getSession().getFlushMode();
+            flushMode = getSession().getHibernateFlushMode();
             
             return getSession();
         }
@@ -112,7 +112,7 @@ public class LocalCommandExecutionTest extends TestCase {
         @Transactional
         public void transactional() {
             value++;
-            flushMode = getSession().getFlushMode();
+            flushMode = getSession().getHibernateFlushMode();
         }
     }
 
@@ -124,7 +124,7 @@ public class LocalCommandExecutionTest extends TestCase {
 
         public void invokeRemotable() {
             value++;
-            flushMode = getSession().getFlushMode();
+            flushMode = getSession().getHibernateFlushMode();
         }
 
         public void localMethod() {
@@ -141,7 +141,7 @@ public class LocalCommandExecutionTest extends TestCase {
 
         public void invokeTransactional() {
             value++;
-            flushMode = getSession().getFlushMode();
+            flushMode = getSession().getHibernateFlushMode();
         }
 
         public void localMethod() {

@@ -4,6 +4,8 @@ commons-logging = "1.4.0"
 commons-jxpath = "1.4.0"
 commons-validator = "1.11.0"
 taglibs = "1.2.5"
+hibernate = "5.6.15.Final"
+javax-persistence = "2.2"
 
 [libraries]
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "beanutils" }
@@ -12,3 +14,5 @@ commons-jxpath = { module = "commons-jxpath:commons-jxpath", version.ref = "comm
 commons-validator = { module = "commons-validator:commons-validator", version.ref = "commons-validator" }
 taglibs-standard-impl = { module = "org.apache.taglibs:taglibs-standard-impl", version.ref = "taglibs" }
 taglibs-standard-spec = { module = "org.apache.taglibs:taglibs-standard-spec", version.ref = "taglibs" }
+hibernate-core = { module = "org.hibernate:hibernate-core", version.ref = "hibernate" }
+javax-persistence-api = { module = "javax.persistence:javax.persistence-api", version.ref = "javax-persistence" }

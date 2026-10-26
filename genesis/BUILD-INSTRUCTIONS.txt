@@ -24,6 +24,10 @@ because no compatible Maven Central artifacts provide them. Gradle invokes the
 existing Ant `server:ejbdoclet` target to generate EJB interfaces. The refreshed
 Commons and Taglibs dependency versions are centralized in
 `gradle/libs.versions.toml` and shared between production and test configurations.
+Hibernate is upgraded to 5.6.15.Final, with the matching `javax.persistence`
+2.2 API. Its legacy Criteria API remains in use as a compatibility bridge;
+the dedicated Hibernate tests compile, but running them still requires the
+legacy integration-test runtime setup described above.
 
 The old Ant build remains available for legacy test, deployment, and site tasks.
 Those tasks require the external JBoss installation and configuration described
