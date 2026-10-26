@@ -62,8 +62,8 @@ project(':shared') {
             exclude group: 'javax.transaction', module: 'jta'
         }
         api 'javax.transaction:jta:1.1'
-        api 'commons-beanutils:commons-beanutils:1.9.1'
-        api 'commons-logging:commons-logging:1.1.3'
+        api libs.commons.beanutils
+        api libs.commons.logging
         api files(rootProject.file('lib/commons/reusable-components-20060810.jar'))
     }
 }
@@ -130,10 +130,10 @@ project(':client') {
         implementation 'bsf:bsf:2.4.0'
         implementation 'org.apache-extras.beanshell:bsh:2.0b5'
         implementation 'commons-el:commons-el:1.0'
-        implementation 'commons-jxpath:commons-jxpath:1.3'
-        implementation 'commons-validator:commons-validator:1.4.0'
-        implementation 'org.apache.taglibs:taglibs-standard-impl:1.2.1'
-        implementation 'org.apache.taglibs:taglibs-standard-spec:1.2.1'
+        implementation libs.commons.jxpath
+        implementation libs.commons.validator
+        implementation libs.taglibs.standard.impl
+        implementation libs.taglibs.standard.spec
         implementation 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.3'
         implementation 'rhino:js:1.7R2'
         implementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
@@ -158,7 +158,7 @@ project(':aspect') {
 
 project(':container') {
     dependencies {
-        implementation 'commons-logging:commons-logging:1.1.3'
+        implementation libs.commons.logging
     }
 }
 
@@ -182,8 +182,8 @@ project(':tests') {
     dependencies {
         testImplementation 'junit:junit:4.13.2'
         testImplementation 'org.hsqldb:hsqldb:1.8.0.10'
-        testImplementation 'commons-jxpath:commons-jxpath:1.3'
-        testImplementation 'commons-validator:commons-validator:1.4.0'
+        testImplementation libs.commons.jxpath
+        testImplementation libs.commons.validator
         testImplementation 'javax.persistence:persistence-api:1.0.2'
         testImplementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
         testImplementation project(':shared')

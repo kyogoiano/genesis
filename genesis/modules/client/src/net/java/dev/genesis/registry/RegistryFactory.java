@@ -40,8 +40,10 @@ public class RegistryFactory extends Registry {
          e.printStackTrace();
          throw new RuntimeException(e);
       } catch (InvocationTargetException e) {
-         e.printStackTrace();
-         throw new RuntimeException(e);
+         Throwable cause = e.getTargetException();
+         Throwable failure = cause == null ? e : cause;
+         failure.printStackTrace();
+         throw new RuntimeException(failure);
       } catch (NoSuchMethodException e) {
          e.printStackTrace();
          throw new RuntimeException(e);

@@ -1,0 +1,14 @@
+[versions]
+beanutils = "1.11.0"
+commons-logging = "1.4.0"
+commons-jxpath = "1.4.0"
+commons-validator = "1.11.0"
+taglibs = "1.2.5"
+
+[libraries]
+commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "beanutils" }
+commons-logging = { module = "commons-logging:commons-logging", version.ref = "commons-logging" }
+commons-jxpath = { module = "commons-jxpath:commons-jxpath", version.ref = "commons-jxpath" }
+commons-validator = { module = "commons-validator:commons-validator", version.ref = "commons-validator" }
+taglibs-standard-impl = { module = "org.apache.taglibs:taglibs-standard-impl", version.ref = "taglibs" }
+taglibs-standard-spec = { module = "org.apache.taglibs:taglibs-standard-spec", version.ref = "taglibs" }

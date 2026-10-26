@@ -21,7 +21,9 @@ for execution until that runtime setup is migrated.
 Dependencies are resolved from Maven Central except the historical
 `reusable-components-20060810.jar` and the XDoclet generator, which remain local
 because no compatible Maven Central artifacts provide them. Gradle invokes the
-existing Ant `server:ejbdoclet` target to generate EJB interfaces.
+existing Ant `server:ejbdoclet` target to generate EJB interfaces. The refreshed
+Commons and Taglibs dependency versions are centralized in
+`gradle/libs.versions.toml` and shared between production and test configurations.
 
 The old Ant build remains available for legacy test, deployment, and site tasks.
 Those tasks require the external JBoss installation and configuration described
