@@ -32,7 +32,6 @@
 
    
    <path id="xdoclet.path">
-      <fileset dir="${genesis.j2ee.dist}" includes="*.jar" />
 		<fileset dir="${genesis.xdoclet.dist}" includes="*.jar" />
 	</path>
 
@@ -62,13 +61,6 @@
 		<fileset dir="${genesis.commons.dist}" includes="reusable-components*.jar" />
 	</path>
 
-	<path id="server.dependency.classpath">
-		<path location="${genesis.module.shared}/${build.dest}" />
-		<fileset dir="${genesis.hibernate.dist}" includes="hibernate*.jar" />
-		<fileset dir="${genesis.commons.dist}" includes="commons-logging*.jar" />
-		<fileset dir="${genesis.j2ee.dist}" includes="jboss-j2ee.jar" />
-	</path>
-
 	<path id="client.dependency.classpath">
       <path location="${genesis.module.shared}/${build.dest}" />
       <path refid="script.path" />
@@ -94,7 +86,6 @@
 		<path location="${genesis.module.shared}/${build.dest}" />
 		<path location="${genesis.module.client}/${build.dest}" />
 		<fileset dir="${genesis.hibernate.dist}" includes="hibernate*.jar" />
-		<fileset dir="${genesis.j2ee.dist}" includes="jboss-j2ee.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="commons-beanutils*.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="commons-logging*.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="reusable-components*.jar" />
@@ -111,9 +102,8 @@
       <path location="${genesis.module.annotation}/${build.dest}" />
 		<path location="${genesis.module.client}/${build.dest}" />
       <path refid="script.path" />
-		<fileset dir="${genesis.hibernate.dist}" includes="hibernate*.jar, ejb3-*.jar" />
-		<fileset dir="${genesis.j2ee.dist}" includes="jboss-j2ee.jar" />
-		<fileset dir="${genesis.commons.dist}" includes="commons-beanutils*.jar" />
+      <fileset dir="${genesis.hibernate.dist}" includes="hibernate*.jar, ejb3-*.jar" />
+      <fileset dir="${genesis.commons.dist}" includes="commons-beanutils*.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="commons-logging*.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="commons-validator*.jar" />
 		<fileset dir="${genesis.commons.dist}" includes="reusable-components*.jar" />
@@ -122,7 +112,6 @@
 
 	</path>
 
-   <taskdef name="ejbdoclet" classname="xdoclet.modules.ejb.EjbDocletTask" classpathref="xdoclet.path" />
    <taskdef name="genesisdoclet" classname="xdoclet.modules.genesis.GenesisDocletTask" classpathref="xdoclet.path" />
    <taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="xdoclet.path" />
 
@@ -157,47 +146,15 @@
 		</jar>
 	</target>
 
-	<target name="server:ejbdoclet">
-		<mkdir dir="${genesis.module.server}/${build.src}" />
-		<ejbdoclet destdir="${genesis.module.server}/${build.src}" ejbSpec="2.1">
-			<fileset dir="${genesis.module.server}/${src.dir}" includes="**/*EJB.java" />
-			<deploymentdescriptor destdir="${genesis.module.server}/${build.src}/META-INF"
-			                      validatexml="${xdoclet.validatexml}"
-			                      xmlencoding="ISO-8859-1" />
-			<homeinterface />
-			<localhomeinterface />
-			<remoteinterface />
-			<localinterface />
-         <!--jboss destdir="${genesis.module.server}/${build.src}/META-INF" /-->
-		</ejbdoclet>
-	</target>
-
-	<target name="server:compile" depends="server:ejbdoclet">
-		<mkdir dir="${genesis.module.server}/${build.dest}" />
-		<javac destdir="${genesis.module.server}/${build.dest}"
-		       debug="true"
-		       source="1.8"
-		       target="1.8"
-		       classpathref="server.dependency.classpath"
-               includeantruntime="false">
-			<src path="${genesis.module.server}/${src.dir}" />
-			<src path="${genesis.module.server}/${build.src}" />
-		</javac>
-		<antcall target="server:resources" />
+	<target name="server:compile">
+		<fail message="Ant server compilation is retired after the EJB 3 migration. Use ./gradlew :server:build." />
 	</target>
 
 	<target name="server:resources">
 		<copy todir="${genesis.module.shared}/${build.dest}" overwrite="true">
 			<fileset dir="${genesis.module.server}/${build.dest}">
 				<include name="**/CommandExecutor.class" />
-				<include name="**/CommandExecutorHome.class" />
 				<include name="**/CommandExecutorLocal.class" />
-				<include name="**/CommandExecutorLocalHome.class" />
-			</fileset>
-		</copy>
-		<copy todir="${genesis.module.server}/${build.dest}" overwrite="true">
-			<fileset dir="${genesis.module.server}/${build.src}">
-				<include name="**/*.xml" />
 			</fileset>
 		</copy>
 	</target>

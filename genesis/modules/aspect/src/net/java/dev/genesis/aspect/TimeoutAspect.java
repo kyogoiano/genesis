@@ -229,14 +229,14 @@ public class TimeoutAspect {
       threadLocal.set(workerThread);
    }
 
-   @Around("execution(* net.java.dev.genesis.tests..TimeoutTest$*.*(..))")
+   @Around("execution(* net.java.dev.genesis.tests..TimeoutTest.*.*(..))")
    public Object timeoutAdvice(final ProceedingJoinPoint jp) throws Throwable {
       WorkerThread thread = getWorkerThread();
 
       if (thread == null) {
          thread = new WorkerThread(keepThreadInstance);
          setWorkerThread(thread);
-
+  
          if (keepThreadInstance) {
             if (log.isDebugEnabled()) {
                log.debug(Bundle.getMessage(TimeoutAspect.class,

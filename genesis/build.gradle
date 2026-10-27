@@ -66,50 +66,9 @@ project(':shared') {
 }
 
 project(':server') {
-    def generatedSources = layout.buildDirectory.dir('generated/sources/xdoclet/main')
-
-    sourceSets.main.java.srcDir(generatedSources)
-    sourceSets.main.resources.srcDir(generatedSources)
-    sourceSets.main.resources.include('**/*.xml')
-
     dependencies {
         implementation project(':shared')
         implementation 'javax.ejb:ejb-api:3.0'
-    }
-
-    tasks.register('generateEjbSources') {
-        inputs.files(fileTree('src') { include '**/*EJB.java' })
-        inputs.files(
-                rootProject.file('build.xml'),
-                rootProject.file('build.properties'),
-                rootProject.file('project.properties'),
-                fileTree(rootProject.file('../xdoclet/dist'))
-        )
-        outputs.dir(generatedSources)
-
-        doLast {
-            def destination = generatedSources.get().asFile
-            delete destination
-            destination.mkdirs()
-
-            ant.ant(
-                    antfile: rootProject.file('build.xml'),
-                    target: 'server:ejbdoclet',
-                    dir: rootProject.projectDir
-            ) {
-                property(
-                        name: 'build.src',
-                        value: 'build/generated/sources/xdoclet/main'
-                )
-            }
-        }
-    }
-
-    tasks.named('compileJava') {
-        dependsOn tasks.named('generateEjbSources')
-    }
-    tasks.named('processResources') {
-        dependsOn tasks.named('generateEjbSources')
     }
 }
 

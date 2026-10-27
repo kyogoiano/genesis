@@ -14,7 +14,6 @@ import java.lang.reflect.InvocationTargetException;
 import javax.naming.InitialContext;
 
 import net.java.dev.genesis.ejb.CommandExecutorLocal;
-import net.java.dev.genesis.ejb.CommandExecutorLocalHome;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,7 +29,6 @@ public class LocalEJBCommandExecutionAspect {
          LogFactory.getLog(LocalEJBCommandExecutionAspect.class);
 
    private final ThreadLocal threadLocal = new InheritableThreadLocal();
-   private CommandExecutorLocalHome home;
    private CommandExecutorLocal session;
 
    @Pointcut("(execution(* net.java.dev.genesis.command.Command+.invoke*(..))"
@@ -92,19 +90,16 @@ public class LocalEJBCommandExecutionAspect {
    private CommandExecutorLocal getCommandExecutor() {
       if (session == null) {
          try {
-            if (home == null) {
-               String jndiName = System.getProperty(
-                     "genesis.aspect.localEjbJndiName");
-               if (jndiName == null) {
-                  throw new IllegalStateException(
-                        "Set genesis.aspect.localEjbJndiName before enabling local EJB execution");
-               }
-               home = (CommandExecutorLocalHome)new InitialContext()
-                     .lookup(jndiName);
+            String jndiName = System.getProperty(
+                  "genesis.aspect.localEjbJndiName");
+            if (jndiName == null) {
+               throw new IllegalStateException(
+                     "Set genesis.aspect.localEjbJndiName before enabling local EJB execution");
             }
-            session = home.create();
+            session = (CommandExecutorLocal)new InitialContext()
+                  .lookup(jndiName);
          } catch (Exception e) {
-            home = null;
+            session = null;
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
          }

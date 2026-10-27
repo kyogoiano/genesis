@@ -50,9 +50,9 @@
             <properties/>
         </dependency>
         <dependency>
-            <groupId>j2ee</groupId>
-            <artifactId>j2ee</artifactId>
-            <jar>jboss-j2ee.jar</jar>
+            <groupId>javax.ejb</groupId>
+            <artifactId>ejb-api</artifactId>
+            <version>3.0</version>
             <type>jar</type>
             <properties/>
         </dependency>

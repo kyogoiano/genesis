@@ -1,8 +1,8 @@
 ## Gradle build
 
-The Gradle wrapper pins Gradle 8.14.5, which supports running Gradle on Java 8.
-The production modules target Java 8 bytecode. Run these commands from the
-`genesis` directory:
+The Gradle wrapper pins Gradle 8.14.5 and can run on Java 8 or Java 11.
+Production modules target Java 8 bytecode. Run these commands from the `genesis`
+directory:
 
    ./gradlew build
 
@@ -13,9 +13,8 @@ To run only the client tests:
    ./gradlew :client:test
 
 The client tests include Swing tests and therefore need a working graphical
-environment. The tests module uses embedded Apache OpenEJB 8.0.16, which runs
-on Java 8 and supports the project's EJB 2.x home interfaces. Run its selected
-integration tests with:
+environment. The tests module uses embedded Apache OpenEJB 8.0.16 and deploys
+the executor through EJB 3 business interfaces. Run its integration tests with:
 
    ./gradlew :tests:integrationTest
 
@@ -26,22 +25,21 @@ the abstract `TestCase` helper and `ValidatorTest`; the latter requires a
 `validation.xml` fixture that is not present in the repository.
 
 Dependencies are resolved from Maven Central except the historical
-`reusable-components-20060810.jar` and the XDoclet generator, which remain local
-because no compatible Maven Central artifacts provide them. Gradle invokes the
-existing Ant `server:ejbdoclet` target to generate EJB interfaces. The refreshed
-Commons and Taglibs dependency versions are centralized in
-`gradle/libs.versions.toml` and shared between production and test configurations.
+`reusable-components-20060810.jar`, which remains local. The executor uses EJB
+3 business interfaces; its interfaces are regular sources and no longer require
+XDoclet generation. The refreshed Commons and Taglibs dependency versions are
+centralized in `gradle/libs.versions.toml` and shared between production and test configurations.
 Hibernate is upgraded to 5.6.15.Final, with the matching `javax.persistence`
 2.2 API. Its legacy Criteria API remains in use as a compatibility bridge.
 
-Ant remains available for EJB source generation and other non-aspect legacy
-tasks. Its old aspect compilation, annotation preprocessing, weaving, and test
-workflows now fail fast with guidance to use Gradle. AspectJ compilation,
-weaving, packaging, and tests are handled by Gradle. The legacy sample-project
-Ant templates remain for reference, but their aspect-dependent build and
-deployment flows are retired.
+Ant remains available for other legacy tasks. Its EJB 2.x server compilation
+and home-interface generation, aspect compilation, annotation preprocessing,
+weaving, and test workflows are retired. Use Gradle to compile the EJB 3 server
+module, build AspectJ, and run tests. The legacy sample-project Ant templates
+remain for reference, but their aspect-dependent build and deployment flows
+are retired.
 
-The Ant build files are retained because `build.xml` provides EJB generation
-and legacy targets, `build_dist.xml` assembles the distribution, and
+The Ant build files are retained because `build.xml` provides other legacy
+targets, `build_dist.xml` assembles the distribution, and
 `master_build.xml`, `desktop_build.xml`, and `web_build.xml` are used by the
 sample-project build templates. They are not unused Gradle leftovers.

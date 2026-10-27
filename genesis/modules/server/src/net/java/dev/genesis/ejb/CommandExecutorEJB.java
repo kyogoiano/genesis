@@ -21,8 +21,12 @@ package net.java.dev.genesis.ejb;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -30,27 +34,14 @@ import net.java.dev.genesis.command.TransactionalInjector;
 import net.java.dev.genesis.command.CommandExecutionGuard;
 import net.java.dev.genesis.reflection.ReflectionInvoker;
 
-/**
- * @ejb.bean name="CommandExecutor" type="Stateless" view-type="both"
- *           jndi-name="ejb/CommandExecutor" local-jndi-name="local/ejb/CommandExecutor"
- * @ejb.home remote-class="net.java.dev.genesis.ejb.CommandExecutorHome"
- *           local-class="net.java.dev.genesis.ejb.CommandExecutorLocalHome"
- * @ejb.interface remote-class="net.java.dev.genesis.ejb.CommandExecutor"
- *           local-class="net.java.dev.genesis.ejb.CommandExecutorLocal"
- * @ejb.env-entry name="HibernateFactoryAddress" type="java.lang.String" 
- *                value="jboss:/hibernate/SessionFactory"
- * @ejb.env-entry name="TransactionalInjector" type="java.lang.String" 
- *                value="net.java.dev.genesis.ejb.hibernate.EJBHibernateTransactionalInjector"
- */
-public class CommandExecutorEJB implements SessionBean {
+@Stateless(name = "CommandExecutor")
+public class CommandExecutorEJB implements CommandExecutor, CommandExecutorLocal {
    private TransactionalInjector injector;
+   @Resource
+   private SessionContext sessionContext;
    
-   public void ejbActivate() {}
-   public void ejbPassivate() {}
-   public void ejbCreate() {}
-   public void ejbRemove() {}
-   
-   public void setSessionContext(SessionContext sessionContext) {
+   @PostConstruct
+   public void initialize() {
       try {
          final InitialContext ctx = new InitialContext();
          final String className = (String)ctx.lookup(
@@ -70,10 +61,8 @@ public class CommandExecutorEJB implements SessionBean {
       injector.init(sessionContext);
    }
 
-   /**
-    * @ejb.interface-method
-    * @ejb.transaction type="Required"
-    */
+   @Override
+   @TransactionAttribute(TransactionAttributeType.REQUIRED)
    public Object executeTransaction(Object o, String methodName,
          String[] classNames, Object[] args) throws ClassNotFoundException,
                               IllegalAccessException, NoSuchMethodException,
@@ -81,10 +70,8 @@ public class CommandExecutorEJB implements SessionBean {
        return execute(o, methodName, classNames, args, true);
    }
 
-   /**
-    * @ejb.interface-method
-    * @ejb.transaction type="Supports"
-    */
+   @Override
+   @TransactionAttribute(TransactionAttributeType.SUPPORTS)
    public Object executeQuery(Object o, String methodName,
          String[] classNames, Object[] args) throws ClassNotFoundException,
                               IllegalAccessException, NoSuchMethodException,
