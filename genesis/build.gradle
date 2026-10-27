@@ -11,7 +11,7 @@ dependencies {
 }
 
 group = 'net.java.dev.genesis'
-version = '3.4.0'
+version = '3.5.0'
 
 allprojects {
     repositories {
@@ -33,14 +33,14 @@ subprojects {
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_1_9)) {
-            options.release.set(8)
+        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_11)) {
+            options.release.set(11)
         }
     }
 
@@ -56,9 +56,10 @@ project(':shared') {
 
     dependencies {
         api(libs.hibernate.core) {
-            exclude group: 'javax.transaction', module: 'jta'
+            exclude group: 'org.jboss.spec.javax.transaction',
+                    module: 'jboss-transaction-api_1.2_spec'
         }
-        api 'javax.transaction:jta:1.1'
+        api libs.javax.transaction.api
         api libs.commons.beanutils
         api libs.commons.logging
         api files(rootProject.file('lib/commons/reusable-components-20060810.jar'))
@@ -68,7 +69,8 @@ project(':shared') {
 project(':server') {
     dependencies {
         implementation project(':shared')
-        implementation 'javax.ejb:ejb-api:3.0'
+        implementation libs.javax.ejb.api
+        compileOnly libs.javax.annotation.api
     }
 }
 
@@ -84,14 +86,14 @@ project(':client') {
         implementation project(':shared')
         implementation project(':annotation')
         implementation 'bsf:bsf:2.4.0'
-        implementation 'org.apache-extras.beanshell:bsh:2.0b5'
+        implementation libs.beanshell
         implementation 'commons-el:commons-el:1.0'
         implementation libs.commons.jxpath
         implementation libs.commons.validator
         implementation libs.taglibs.standard.impl
         implementation libs.taglibs.standard.spec
         implementation 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.3'
-        implementation 'rhino:js:1.7R2'
+        implementation libs.rhino
         implementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
         testImplementation 'junit:junit:4.13.2'
         testRuntimeOnly libs.aspectj.runtime
@@ -108,7 +110,7 @@ project(':aspect') {
         implementation project(':server')
         implementation project(':client')
         api libs.aspectj.runtime
-        implementation 'javax.ejb:ejb-api:3.0'
+        implementation libs.javax.ejb.api
     }
 }
 
@@ -157,8 +159,7 @@ project(':tests') {
 
     dependencies {
         testImplementation 'junit:junit:4.13.2'
-        integrationTestImplementation(
-                "org.hsqldb:hsqldb:${libs.versions.hsqldb.get()}:jdk8")
+        integrationTestImplementation libs.hsqldb
         testImplementation libs.commons.jxpath
         testImplementation libs.commons.validator
         testImplementation libs.javax.persistence.api

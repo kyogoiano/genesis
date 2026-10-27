@@ -1,7 +1,7 @@
 ## Gradle build
 
-The Gradle wrapper pins Gradle 8.14.5 and can run on Java 8 or Java 11.
-Production modules target Java 8 bytecode. Run these commands from the `genesis`
+The Gradle wrapper pins Gradle 8.14.5. Build with JDK 11 or newer; production
+modules target Java 11 bytecode. Run these commands from the `genesis`
 directory:
 
    ./gradlew build
@@ -18,10 +18,9 @@ the executor through EJB 3 business interfaces. Run its integration tests with:
 
    ./gradlew :tests:integrationTest
 
-The integration test build uses AspectJ 1.9.7 for post-compile weaving. The
+The integration test build uses AspectJ 1.9.21 for post-compile weaving. The
 weaver processes the project classes and Thinlet dependency before tests run.
-The version is selected because it can run on Java 8. The test task excludes
-the abstract `TestCase` helper and `ValidatorTest`; the latter requires a
+The test task excludes the abstract `TestCase` helper and `ValidatorTest`; the latter requires a
 `validation.xml` fixture that is not present in the repository.
 
 Dependencies are resolved from Maven Central except the historical

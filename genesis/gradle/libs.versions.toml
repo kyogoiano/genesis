@@ -6,9 +6,14 @@ commons-validator = "1.11.0"
 taglibs = "1.2.5"
 hibernate = "5.6.15.Final"
 javax-persistence = "2.2"
+javax-annotation = "1.3.2"
+javax-ejb = "3.2.2"
+javax-transaction = "1.3"
+beanshell = "2.0b6"
+rhino = "1.8.0"
 tomee = "8.0.16"
-hsqldb = "2.6.1"
-aspectj = "1.9.7"
+hsqldb = "2.7.4"
+aspectj = "1.9.21"
 
 [libraries]
 commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "beanutils" }
@@ -19,7 +24,12 @@ taglibs-standard-impl = { module = "org.apache.taglibs:taglibs-standard-impl", v
 taglibs-standard-spec = { module = "org.apache.taglibs:taglibs-standard-spec", version.ref = "taglibs" }
 hibernate-core = { module = "org.hibernate:hibernate-core", version.ref = "hibernate" }
 javax-persistence-api = { module = "javax.persistence:javax.persistence-api", version.ref = "javax-persistence" }
+javax-annotation-api = { module = "javax.annotation:javax.annotation-api", version.ref = "javax-annotation" }
+javax-ejb-api = { module = "javax.ejb:javax.ejb-api", version.ref = "javax-ejb" }
+javax-transaction-api = { module = "javax.transaction:javax.transaction-api", version.ref = "javax-transaction" }
 tomee-embedded-core = { module = "org.apache.tomee:openejb-core", version.ref = "tomee" }
 hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
 aspectj-runtime = { module = "org.aspectj:aspectjrt", version.ref = "aspectj" }
 aspectj-tools = { module = "org.aspectj:aspectjtools", version.ref = "aspectj" }
+beanshell = { module = "org.apache-extras.beanshell:bsh", version.ref = "beanshell" }
+rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
