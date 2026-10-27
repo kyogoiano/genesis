@@ -18,20 +18,10 @@
  */
 package net.java.dev.genesis.script.el;
 
-import javax.servlet.jsp.el.ELException;
-import javax.servlet.jsp.el.ExpressionEvaluator;
-
 import net.java.dev.genesis.script.ScriptExpression;
 
 public class ELExpression extends ScriptExpression {
-   public ELExpression(String expr, ExpressionEvaluator evaluator) {
+   public ELExpression(String expr) {
       super(expr.startsWith("${") ? expr : "${" + expr + '}'); // NOI18N
-     
-      try {
-         // Compile and cache the expression
-         evaluator.parseExpression(getExpressionString(), Object.class, null);
-      } catch (ELException e) {
-         throw new RuntimeException(e);
-      }
    }
 }

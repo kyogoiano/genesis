@@ -28,6 +28,13 @@ Dependencies are resolved from Maven Central except the historical
 3 business interfaces; its interfaces are regular sources and no longer require
 XDoclet generation. The refreshed Commons and Taglibs dependency versions are
 centralized in `gradle/libs.versions.toml` and shared between production and test configurations.
+The client uses the Servlet 3.1 API as a compile-only dependency because a web
+container supplies it. Apache Taglibs Standard 1.2.5 is the latest release in
+the `javax` namespace and remains compatible with these APIs. The scripting
+module uses the Expression Language 3.0 API and GlassFish reference
+implementation instead of the deprecated JSP EL and Commons EL APIs. Genesis
+selects the GlassFish implementation directly so the host container's EL
+provider setting cannot interfere with function argument conversion.
 Hibernate is upgraded to 5.6.15.Final, with the matching `javax.persistence`
 2.2 API. Its legacy Criteria API remains in use as a compatibility bridge.
 

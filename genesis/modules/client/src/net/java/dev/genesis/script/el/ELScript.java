@@ -18,25 +18,26 @@
  */
 package net.java.dev.genesis.script.el;
 
-import javax.servlet.jsp.el.ExpressionEvaluator;
+import com.sun.el.ExpressionFactoryImpl;
+
+import javax.el.ExpressionFactory;
 
 import net.java.dev.genesis.script.Script;
 import net.java.dev.genesis.script.ScriptContext;
 import net.java.dev.genesis.script.ScriptExpression;
 
-import org.apache.commons.el.ExpressionEvaluatorImpl;
-
 public class ELScript implements Script {
-   private final ExpressionEvaluator evaluator = new ExpressionEvaluatorImpl();
+   private final ExpressionFactory expressionFactory =
+         new ExpressionFactoryImpl();
 
    protected ELScript() {
    }
 
    public ScriptContext newContext(Object root) {
-      return new ELScriptContext(root, evaluator);
+      return new ELScriptContext(root, expressionFactory);
    }
 
    public ScriptExpression compile(String expression) {
-      return new ELExpression(expression, evaluator);
+      return new ELExpression(expression);
    }
 }

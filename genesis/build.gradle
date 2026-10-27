@@ -87,12 +87,13 @@ project(':client') {
         implementation project(':annotation')
         implementation 'bsf:bsf:2.4.0'
         implementation libs.beanshell
-        implementation 'commons-el:commons-el:1.0'
         implementation libs.commons.jxpath
         implementation libs.commons.validator
         implementation libs.taglibs.standard.impl
         implementation libs.taglibs.standard.spec
-        implementation 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.3'
+        compileOnly libs.javax.servlet.api
+        implementation libs.javax.el.api
+        implementation libs.javax.el.impl
         implementation libs.rhino
         implementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
         testImplementation 'junit:junit:4.13.2'
