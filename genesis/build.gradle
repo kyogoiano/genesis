@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'net.java.dev.genesis'
-version = '3.3'
+version = '3.4.0'
 
 allprojects {
     repositories {
