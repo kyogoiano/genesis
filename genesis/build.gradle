@@ -56,11 +56,8 @@ project(':shared') {
     sourceSets.main.resources.include('**/Bundle*.properties')
 
     dependencies {
-        api(libs.hibernate.core) {
-            exclude group: 'org.jboss.spec.javax.transaction',
-                    module: 'jboss-transaction-api_1.2_spec'
-        }
-        api libs.javax.transaction.api
+        api libs.hibernate.core
+        api libs.jakarta.transaction.api
         api libs.commons.beanutils
         api libs.commons.logging
         api files(rootProject.file('lib/commons/reusable-components-20060810.jar'))
@@ -70,8 +67,8 @@ project(':shared') {
 project(':server') {
     dependencies {
         implementation project(':shared')
-        implementation libs.javax.ejb.api
-        compileOnly libs.javax.annotation.api
+        implementation libs.jakarta.ejb.api
+        compileOnly libs.jakarta.annotation.api
     }
 }
 
@@ -91,11 +88,11 @@ project(':client') {
         implementation libs.beanshell
         implementation libs.commons.jxpath
         implementation libs.commons.validator
-        implementation libs.taglibs.standard.impl
-        implementation libs.taglibs.standard.spec
-        compileOnly libs.javax.servlet.api
-        implementation libs.javax.el.api
-        implementation libs.javax.el.impl
+        implementation libs.jakarta.jstl.impl
+        implementation libs.jakarta.jstl.api
+        compileOnly libs.jakarta.servlet.api
+        implementation libs.jakarta.el.api
+        implementation libs.jakarta.el.impl
         implementation libs.rhino
         implementation libs.rhino.engine
         implementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
@@ -114,7 +111,7 @@ project(':aspect') {
         implementation project(':server')
         implementation project(':client')
         api libs.aspectj.runtime
-        implementation libs.javax.ejb.api
+        implementation libs.jakarta.ejb.api
     }
 }
 
@@ -166,7 +163,7 @@ project(':tests') {
         integrationTestImplementation libs.hsqldb
         testImplementation libs.commons.jxpath
         testImplementation libs.commons.validator
-        testImplementation libs.javax.persistence.api
+        testImplementation libs.jakarta.persistence.api
         testImplementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
         integrationTestImplementation libs.tomee.embedded.core
         testImplementation project(':shared')
@@ -271,27 +268,27 @@ def aspectjWeaving = tasks.register('weaveAspectJ') {
                     weaveOutput(subproject, sourceSet, classDirectory)
                 }
             }
-
-            def thinletJar = project(':client').sourceSets.main.compileClasspath.files
-                    .find { it.name.startsWith('thinlet-') && it.name.endsWith('.jar') }
-            if (thinletJar == null) {
-                throw new GradleException('Thinlet dependency was not found for AspectJ weaving')
-            }
-            def wovenThinlet = layout.buildDirectory.dir(
-                    'aspectj-woven/dependencies/thinlet').get().asFile
-            project.delete wovenThinlet
-            wovenThinlet.mkdirs()
-            project.providers.javaexec {
-                classpath = configurations.aspectjTools
-                mainClass = 'org.aspectj.tools.ajc.Main'
-                args '-inpath', thinletJar.absolutePath,
-                        '-aspectpath', aspectClasses.absolutePath,
-                        '-classpath', (classpathFiles + thinletJar)
-                                .collect { it.absolutePath }.join(File.pathSeparator),
-                        '-d', wovenThinlet.absolutePath,
-                        '-Xlint:ignore'
-            }
         }
+
+        def thinletJar = project(':client').sourceSets.main.compileClasspath.files
+                .find { it.name.startsWith('thinlet-') && it.name.endsWith('.jar') }
+        if (thinletJar == null) {
+            throw new GradleException('Thinlet dependency was not found for AspectJ weaving')
+        }
+        def wovenThinlet = layout.buildDirectory.dir(
+                'aspectj-woven/dependencies/thinlet').get().asFile
+        project.delete wovenThinlet
+        wovenThinlet.mkdirs()
+        project.providers.javaexec {
+            classpath = configurations.aspectjTools
+            mainClass = 'org.aspectj.tools.ajc.Main'
+            args '-inpath', thinletJar.absolutePath,
+                    '-aspectpath', aspectClasses.absolutePath,
+                    '-classpath', (classpathFiles + thinletJar)
+                            .collect { it.absolutePath }.join(File.pathSeparator),
+                    '-d', wovenThinlet.absolutePath,
+                    '-Xlint:ignore'
+        }.result.get()
     }
 }
 

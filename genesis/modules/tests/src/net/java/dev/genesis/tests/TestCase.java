@@ -21,7 +21,7 @@ package net.java.dev.genesis.tests;
 import java.io.File;
 import java.util.Properties;
 import javax.naming.Context;
-import javax.ejb.embeddable.EJBContainer;
+import jakarta.ejb.embeddable.EJBContainer;
 import java.util.Map;
 import net.java.dev.genesis.ui.metadata.ViewMetadata;
 import net.java.dev.genesis.ui.metadata.ViewMetadataFactory;

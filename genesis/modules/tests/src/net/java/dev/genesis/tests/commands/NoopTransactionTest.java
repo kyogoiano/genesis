@@ -19,8 +19,8 @@
 package net.java.dev.genesis.tests.commands;
 
 import javax.naming.InitialContext;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
+import jakarta.transaction.Status;
+import jakarta.transaction.UserTransaction;
 
 import net.java.dev.genesis.command.Transaction;
 import net.java.dev.genesis.tests.TestCase;

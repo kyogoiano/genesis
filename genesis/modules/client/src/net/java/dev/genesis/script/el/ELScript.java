@@ -20,7 +20,7 @@ package net.java.dev.genesis.script.el;
 
 import com.sun.el.ExpressionFactoryImpl;
 
-import javax.el.ExpressionFactory;
+import jakarta.el.ExpressionFactory;
 
 import net.java.dev.genesis.script.Script;
 import net.java.dev.genesis.script.ScriptContext;
