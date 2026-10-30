@@ -233,7 +233,7 @@ public class DataProviderMetadata {
          final Integer[] integerArray = new Integer[selectedIndexes.length];
 
          for (int i = 0; i < integerArray.length; i++) {
-            integerArray[i] = new Integer(selectedIndexes[i]);
+            integerArray[i] = selectedIndexes[i];
          }
 
          final Object value = indexField.isArray() ? (Object)integerArray : 
@@ -242,8 +242,8 @@ public class DataProviderMetadata {
       } else {
          PropertyUtils.setProperty(target, indexField.getFieldName(),
                selectedIndexes.length == 0 ?
-                     (indexField.isPrimitive() ? new Integer(-1) : null) :
-                     new Integer(selectedIndexes[0]));
+                     (indexField.isPrimitive() ? -1 : null) :
+                       Integer.valueOf(selectedIndexes[0]));
       }
    }
 }

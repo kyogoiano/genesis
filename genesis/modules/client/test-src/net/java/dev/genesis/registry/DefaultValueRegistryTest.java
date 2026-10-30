@@ -32,20 +32,20 @@ public class DefaultValueRegistryTest extends GenesisTestCase {
       Map defaultValues = new HashMap() {
          {
             put(Boolean.TYPE, Boolean.FALSE);
-            put(Byte.TYPE, new Byte((byte)0));
-            put(Short.TYPE, new Short((short)0));
-            put(Integer.TYPE, new Integer(0));
-            put(Long.TYPE, new Long(0));
-            put(Float.TYPE, new Float(0));
-            put(Double.TYPE, new Double(0));
+            put(Byte.TYPE, (byte) 0);
+            put(Short.TYPE, (short) 0);
+            put(Integer.TYPE, 0);
+            put(Long.TYPE, 0L);
+            put(Float.TYPE, (float) 0);
+            put(Double.TYPE, (double) 0);
          }
       };
 
-      for (final Iterator i = defaultValues.entrySet().iterator(); i.hasNext(); ) {
-         Map.Entry entry = (Map.Entry)i.next();
+       for (Object o : defaultValues.entrySet()) {
+           Map.Entry entry = (Map.Entry) o;
 
-         assertEquals(entry.getValue(), DefaultValueRegistry.getInstance().
-               get((Class)entry.getKey()));
-      }
+           assertEquals(entry.getValue(), DefaultValueRegistry.getInstance().
+                   get((Class) entry.getKey()));
+       }
    }
 }

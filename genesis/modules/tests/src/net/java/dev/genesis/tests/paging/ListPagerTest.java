@@ -55,7 +55,7 @@ public class ListPagerTest extends TestCase {
       List list = new ArrayList(elements);
 
       for (int i = 0; i < elements; i++) {
-         list.add(new Integer(i));
+         list.add(i);
       }
 
       return list;
@@ -66,14 +66,14 @@ public class ListPagerTest extends TestCase {
       List list = createList(elements);
       ListPager pager = new ListPager(list);
 
-      testGetPage(pager, 0, 9, 0, 9, true, false, new Integer(0));
-      testGetPage(pager, 0, 10, 0, 10, true, true, new Integer(0));
-      testGetPage(pager, 1, 10, 0, 10, true, true, new Integer(0));
+      testGetPage(pager, 0, 9, 0, 9, true, false, 0);
+      testGetPage(pager, 0, 10, 0, 10, true, true,0);
+      testGetPage(pager, 1, 10, 0, 10, true, true,0);
 
-      testGetPage(pager, 1, 5, 1, 5, false, true, new Integer(5));
-      testGetPage(pager, 2, 5, 1, 5, false, true, new Integer(5));
+      testGetPage(pager, 1, 5, 1, 5, false, true,5);
+      testGetPage(pager, 2, 5, 1, 5, false, true,5);
 
-      testGetPage(pager, 3, 3, 3, 1, false, true, new Integer(9));
+      testGetPage(pager, 3, 3, 3, 1, false, true,9);
    }
 
    private void testGetPage(ListPager pager, int pageNumber, int resultsPerPage, 

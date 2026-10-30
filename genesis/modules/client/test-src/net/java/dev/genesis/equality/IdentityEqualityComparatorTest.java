@@ -25,7 +25,7 @@ public class IdentityEqualityComparatorTest extends GenesisTestCase {
       IdentityEqualityComparator comparator = new IdentityEqualityComparator();
 
       String s = "1";
-      Integer i = new Integer(1);
+      Integer i = 1;
 
       assertTrue(comparator.equals(null, null));
       assertFalse(comparator.equals(null, s));

@@ -299,7 +299,7 @@ public class ValidatorTest extends TestCase {
       map.put(field.getProperty(), "          ");
       valueTest(map, methodName, field, action, true);
 
-      map.put(field.getProperty(), new Double(Double.MAX_VALUE).toString());
+      map.put(field.getProperty(), Double.toString(Double.MAX_VALUE));
       valueTest(map, methodName, field, action, true);
 
       map.put(field.getProperty(), String.valueOf(Double.MIN_VALUE));

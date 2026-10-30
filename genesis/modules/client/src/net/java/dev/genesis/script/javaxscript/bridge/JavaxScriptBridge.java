@@ -1,159 +1,161 @@
 /*
  * The Genesis Project
- * Copyright (C) 2006-2008  Summa Technologies do Brasil Ltda.
- * 
+ * Copyright (C) 2006-2024  Summa Technologies do Brasil Ltda.
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.java.dev.genesis.script.javaxscript.bridge;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.HashSet;
-import java.util.Set;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.ScriptEngineManager;
 
-public class JavaxScriptBridge {
-   private static final JavaxScriptBridge instance = new JavaxScriptBridge();
+/**
+ * Thin façade over the standard {@code javax.script} API (JSR-223).
+ *
+ * <p>The original implementation loaded {@code javax.script} classes via
+ * reflection so the code could compile against JDK 1.4.  Genesis now targets
+ * JDK 11 and above, so the proxy layer is no longer needed.  This class is
+ * kept as a convenience singleton so call-sites in the rest of the
+ * {@code javaxscript} package do not need to change.</p>
+ */
+public final class JavaxScriptBridge {
 
-   private Class scriptEngineManagerClass;
-   private Class scriptContextClass;
-   private Class compiledScriptClass;
-   private Class compilableClass;
-   private Method originalEvalMethod;
-   private int engineScope;
-   private Set methods = new HashSet(2);
+   private static final JavaxScriptBridge INSTANCE = new JavaxScriptBridge();
 
    private JavaxScriptBridge() {
-      try {
-         scriptContextClass = Class.forName("javax.script.ScriptContext"); // NOI18N
-         compiledScriptClass = Class.forName("javax.script.CompiledScript"); // NOI18N
-         compilableClass = Class.forName("javax.script.Compilable"); // NOI18N
-         originalEvalMethod = compiledScriptClass.getDeclaredMethod("eval", // NOI18N
-               new Class[] { scriptContextClass });
-         engineScope = scriptContextClass.getField("ENGINE_SCOPE").getInt(null); // NOI18N
-
-         methods.add("getEngineByName"); // NOI18N
-         methods.add("getContext"); // NOI18N
-
-         scriptEngineManagerClass = Class
-               .forName("javax.script.ScriptEngineManager"); // NOI18N
-      } catch (Exception e) {
-         // not JDK 6 or later
-      }
    }
 
    public static JavaxScriptBridge getInstance() {
-      return instance;
+      return INSTANCE;
    }
 
+   /** Always {@code true} on JDK 6+. */
    public boolean supportsJavaxScript() {
-      return scriptEngineManagerClass != null;
-   }
-
-   public Class getScriptEngineManagerClass() {
-      return scriptEngineManagerClass;
+      return true;
    }
 
    public int getEngineScope() {
-      return engineScope;
+      return javax.script.ScriptContext.ENGINE_SCOPE;
    }
 
-   public Object eval(Object realCompiledScript, Object realCtx)
-         throws Exception {
-      return originalEvalMethod.invoke(realCompiledScript,
-            new Object[] { realCtx });
+   /**
+    * Evaluates a pre-compiled script against the supplied real
+    * {@link javax.script.ScriptContext}.
+    */
+   public Object eval(Object realCompiledScript, Object realCtx) throws Exception {
+      CompiledScript compiled = (CompiledScript) realCompiledScript;
+      javax.script.ScriptContext ctx = (javax.script.ScriptContext) realCtx;
+      return compiled.eval(ctx);
    }
 
-   public ScriptEngineManager createScriptEngineManager() {
-      Object targetInstance = newInstance(scriptEngineManagerClass);
-      ProxyInvocationHandler handler = new ProxyInvocationHandler(
-            targetInstance);
-
-      return (ScriptEngineManager) createProxy(ScriptEngineManager.class,
-            handler);
+   /**
+    * Creates a new {@link ScriptEngineManager} wrapper backed by
+    * {@code javax.script.ScriptEngineManager}.
+    */
+   public net.java.dev.genesis.script.javaxscript.bridge.ScriptEngineManager
+         createScriptEngineManager() {
+      return new DirectScriptEngineManager(new ScriptEngineManager());
    }
 
-   protected Object createProxy(Class desiredClass, InvocationHandler handler) {
-      return createProxy(new Class[] { desiredClass }, handler);
-   }
+   // -----------------------------------------------------------------------
+   // Internal adapters – package-private to keep the public API minimal
+   // -----------------------------------------------------------------------
 
-   protected Object createProxy(Class[] desiredClasses,
-         InvocationHandler handler) {
-      return Proxy.newProxyInstance(Thread.currentThread()
-            .getContextClassLoader(), desiredClasses, handler);
-   }
+   static final class DirectScriptEngineManager
+         implements net.java.dev.genesis.script.javaxscript.bridge.ScriptEngineManager {
 
-   protected Object newInstance(Class clazz) {
-      try {
-         return clazz.newInstance();
-      } catch (InstantiationException e) {
-         throw new RuntimeException(e.getMessage(), e);
-      } catch (IllegalAccessException e) {
-         throw new RuntimeException(e.getMessage(), e);
-      }
-   }
+      private final javax.script.ScriptEngineManager delegate;
 
-   public class ProxyInvocationHandler implements InvocationHandler {
-      private Object target;
-      private boolean isScriptContext;
-      private boolean isCompilable;
-
-      public ProxyInvocationHandler(Object target) {
-         this.target = target;
-         isScriptContext = scriptContextClass.isAssignableFrom(target
-               .getClass());
-         isCompilable = compilableClass.isAssignableFrom(target.getClass());
+      DirectScriptEngineManager(javax.script.ScriptEngineManager delegate) {
+         this.delegate = delegate;
       }
 
-      protected boolean needsProxy(String methodName) {
-         return methods.contains(methodName);
-      }
-
-      public Object invoke(Object proxy, Method method, Object[] args)
-            throws Throwable {
-         final String methodName = method.getName();
-         if (isScriptContext && methodName.equals("getRealContext")) { // NOI18N
-            return target;
-         }
-
-         if (methodName.equals("compile") && !isCompilable) { // NOI18N
+      public net.java.dev.genesis.script.javaxscript.bridge.ScriptEngine
+            getEngineByName(String shortName) {
+         javax.script.ScriptEngine engine = delegate.getEngineByName(shortName);
+         if (engine == null) {
             return null;
          }
+         return new DirectScriptEngine(engine);
+      }
+   }
 
-         final Method originalMethod = target.getClass().getMethod(
-               method.getName(), method.getParameterTypes());
+   static final class DirectScriptEngine
+         implements net.java.dev.genesis.script.javaxscript.bridge.ScriptEngine {
 
-         Object result;
+      private final javax.script.ScriptEngine delegate;
 
-         try {
-            result = originalMethod.invoke(target, args);
-         } catch (InvocationTargetException ite) {
-            throw ite.getTargetException();
+      DirectScriptEngine(javax.script.ScriptEngine delegate) {
+         this.delegate = delegate;
+      }
+
+      public Object eval(String script) throws Exception {
+         return delegate.eval(script);
+      }
+
+      public net.java.dev.genesis.script.javaxscript.bridge.ScriptContext getContext() {
+         return new DirectScriptContext(delegate.getContext(), delegate);
+      }
+
+      public Object compile(String script) throws Exception {
+         if (delegate instanceof Compilable) {
+            try {
+               return ((Compilable) delegate).compile(script);
+            } catch (Error | Exception e) {
+               // Some engines (e.g. BeanShell) advertise Compilable but throw
+               // at runtime — treat as non-compilable and fall back to eval.
+               return null;
+            }
          }
+         return null; // engine does not support compilation; fall back to eval
+      }
+   }
 
-         if (result == null) {
-            return null;
-         }
+   static final class DirectScriptContext
+         implements net.java.dev.genesis.script.javaxscript.bridge.ScriptContext {
 
-         if (!needsProxy(methodName)) {
-            return result;
-         }
+      private final javax.script.ScriptContext delegate;
+      /** Kept so that setAttribute/eval target the same engine scope. */
+      private final javax.script.ScriptEngine engine;
 
-         return createProxy(new Class[] { method.getReturnType() },
-               new ProxyInvocationHandler(result));
+      DirectScriptContext(javax.script.ScriptContext delegate,
+            javax.script.ScriptEngine engine) {
+         this.delegate = delegate;
+         this.engine = engine;
+      }
+
+      public void setAttribute(String name, Object value, int scope) {
+         delegate.setAttribute(name, value, scope);
+      }
+
+      public java.util.Map getBindings(int scope) {
+         return delegate.getBindings(scope);
+      }
+
+      public Object getAttribute(String name) {
+         return delegate.getAttribute(name);
+      }
+
+      public Object removeAttribute(String name, int scope) {
+         return delegate.removeAttribute(name, scope);
+      }
+
+      /** Returns the raw {@link javax.script.ScriptContext} for compiled-script eval. */
+      public Object getRealContext() {
+         return delegate;
       }
    }
 }

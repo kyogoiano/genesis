@@ -29,10 +29,8 @@ public class MockSortableTable extends JComponent {
    private List view;
 
    public MockSortableTable() {
-      this(Arrays.asList(new Integer[] {
-               new Integer(4), new Integer(5), new Integer(2), new Integer(1),
-               new Integer(3)
-            }));
+      this(Arrays.asList(4, 5, 2, 1,
+              3));
    }
 
    public MockSortableTable(List model) {

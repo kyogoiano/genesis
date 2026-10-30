@@ -775,7 +775,7 @@ public class ThinletBinderTest extends GenesisTestCase {
    
    public void testInvokeAction() throws Exception {
       final Map props = new HashMap();
-      props.put("populateCount", new Integer(0));
+      props.put("populateCount", 0);
       
       thinlet = new BaseThinlet() {         
          protected void populate(Object bean, Object root, final Map properties, 
@@ -797,7 +797,7 @@ public class ThinletBinderTest extends GenesisTestCase {
          
          private void increaseCount() {
             Integer i = (Integer)props.get("populateCount");
-            props.put("populateCount", new Integer(i.intValue() + 1));
+            props.put("populateCount", i + 1);
          }
       };
       
@@ -828,7 +828,7 @@ public class ThinletBinderTest extends GenesisTestCase {
       // Invoking action null
       binder.invokeAction(null);
       // Assert thinlet.populate(...) has not been called.
-      assertEquals(new Integer(0), props.get("populateCount"));
+      assertEquals(0, props.get("populateCount"));
       // Assert controller.invokeAction has been called with null values
       assertNull(form.getController().get("invokeAction(actionName)"));
       assertNull(form.getController().get("invokeAction(stringProperties)"));
@@ -836,7 +836,7 @@ public class ThinletBinderTest extends GenesisTestCase {
       // Invoking action 'no_validate_before'
       binder.invokeAction("no_validate_before");
       // Assert thinlet.populate(...) has not been called.
-      assertEquals(new Integer(0), props.get("populateCount"));
+      assertEquals(0, props.get("populateCount"));
       // Assert controller.invokeAction has been called with correct values
       assertEquals("no_validate_before", form.getController().get("invokeAction(actionName)"));
       assertNull(form.getController().get("invokeAction(stringProperties)"));
@@ -844,7 +844,7 @@ public class ThinletBinderTest extends GenesisTestCase {
       // Invoking action 'no_action_metadata'
       binder.invokeAction("no_action_metadata");
       // Assert thinlet.populate(...) has not been called.
-      assertEquals(new Integer(0), props.get("populateCount"));
+      assertEquals(0, props.get("populateCount"));
       // Assert controller.invokeAction has been called with correct values
       assertEquals("no_action_metadata", form.getController().get("invokeAction(actionName)"));
       assertNull(form.getController().get("invokeAction(stringProperties)"));
@@ -852,7 +852,7 @@ public class ThinletBinderTest extends GenesisTestCase {
       // Invoking action 'validate_before'
       binder.invokeAction("validate_before");
       // Assert thinlet.populate(...) has been called.
-      assertEquals(new Integer(1), props.get("populateCount"));
+      assertEquals(1, props.get("populateCount"));
       // Assert controller.invokeAction has been called with correct values
       assertEquals("validate_before", form.getController().get("invokeAction(actionName)"));
       assertSame(props, form.getController().get("invokeAction(stringProperties)"));
@@ -1253,12 +1253,12 @@ public class ThinletBinderTest extends GenesisTestCase {
       assertEquals(3, thinlet.getSelectedIndex(combobox));
       assertEquals(value, thinlet.getText(thinlet.getSelectedItem(combobox)));
 
-      value = new String((String)someItems.get(0));
+      value = someItems.get(0);
       binder.valuesChanged(Collections.singletonMap("objectField", value));
       assertEquals(0, thinlet.getSelectedIndex(combobox));
       assertEquals(value, thinlet.getText(thinlet.getSelectedItem(combobox)));
 
-      value = new String("none");
+      value = "none";
       binder.valuesChanged(Collections.singletonMap("objectField", value));
       assertEquals(-1, thinlet.getSelectedIndex(combobox));
       assertNull(thinlet.getSelectedItem(combobox));
@@ -1280,12 +1280,12 @@ public class ThinletBinderTest extends GenesisTestCase {
       assertEquals(3, thinlet.getSelectedIndex(list));
       assertEquals(value, thinlet.getText(thinlet.getSelectedItem(list)));
 
-      value = new String((String)someItems.get(0));
+      value = someItems.get(0);
       binder.valuesChanged(Collections.singletonMap("objectField", value));
       assertEquals(0, thinlet.getSelectedIndex(list));
       assertEquals(value, thinlet.getText(thinlet.getSelectedItem(list)));
 
-      value = new String("none");
+      value = "none";
       binder.valuesChanged(Collections.singletonMap("objectField", value));
       assertEquals(-1, thinlet.getSelectedIndex(list));
       assertNull(thinlet.getSelectedItem(list));

@@ -73,14 +73,14 @@ public class FormControllerTest extends TestCase {
       final double fieldDouble = 23423.23429;
       final float fieldFloat = 234234234234.43535F;
       final Boolean fieldBooleanWrapper = Boolean.TRUE;
-      final Character fieldCharacterWrapper = new Character('w');
-      final Byte fieldByteWrapper = new Byte((byte) 0xCA);
-      final Short fieldShortWrapper = new Short((short) 115);
-      final Integer fieldIntegerWrapper = new Integer(23423423);
-      final Long fieldLongWrapper = new Long(34223409813244L);
-      final Double fieldDoubleWrapper = new Double(234234423.000123);
-      final Float fieldFloatWrapper = new Float(
-            445095043543435421321333.434344324233F);
+      final char fieldCharacterWrapper = 'w';
+      final byte fieldByteWrapper = (byte) 0xCA;
+      final short fieldShortWrapper = (short) 115;
+      final int fieldIntegerWrapper = 23423423;
+      final long fieldLongWrapper = 34223409813244L;
+      final double fieldDoubleWrapper = 234234423.000123;
+      final float fieldFloatWrapper =
+            445095043543435421321333.434344324233F;
       final String fieldString = "aisfBCASADr";
 
       newValues.put("fieldBoolean", Boolean.toString(fieldBoolean));
@@ -92,14 +92,14 @@ public class FormControllerTest extends TestCase {
       newValues.put("fieldDouble", Double.toString(fieldDouble));
       newValues.put("fieldFloat", Float.toString(fieldFloat));
       newValues.put("fieldBooleanWrapper", fieldBooleanWrapper.toString());
-      newValues.put("fieldCharacterWrapper", fieldCharacterWrapper.toString());
-      newValues.put("fieldByteWrapper", fieldByteWrapper.toString());
-      newValues.put("fieldShortWrapper", fieldShortWrapper.toString());
-      newValues.put("fieldIntegerWrapper", fieldIntegerWrapper.toString());
-      newValues.put("fieldLongWrapper", fieldLongWrapper.toString());
-      newValues.put("fieldDoubleWrapper", fieldDoubleWrapper.toString());
-      newValues.put("fieldFloatWrapper", fieldFloatWrapper.toString());
-      newValues.put("fieldString", fieldString.toString());
+      newValues.put("fieldCharacterWrapper", Character.toString(fieldCharacterWrapper));
+      newValues.put("fieldByteWrapper", Byte.toString(fieldByteWrapper));
+      newValues.put("fieldShortWrapper", Short.toString(fieldShortWrapper));
+      newValues.put("fieldIntegerWrapper", Integer.toString(fieldIntegerWrapper));
+      newValues.put("fieldLongWrapper", Long.toString(fieldLongWrapper));
+      newValues.put("fieldDoubleWrapper", Double.toString(fieldDoubleWrapper));
+      newValues.put("fieldFloatWrapper", Float.toString(fieldFloatWrapper));
+      newValues.put("fieldString", fieldString);
       newValues.put("fieldBigDecimal", "234423,423234");
 
       return newValues;

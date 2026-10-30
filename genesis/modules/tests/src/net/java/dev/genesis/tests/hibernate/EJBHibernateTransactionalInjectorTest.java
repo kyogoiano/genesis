@@ -109,7 +109,7 @@ public class EJBHibernateTransactionalInjectorTest extends TestCase {
       @Remotable
       public HibernateBean getNonExistentBean(Class clazz) throws Exception {
          HibernateBean bean = (HibernateBean)getSession().load(clazz,
-               new Long(Long.MIN_VALUE));
+                 Long.MIN_VALUE);
          Hibernate.initialize(bean);
          return bean;
       }

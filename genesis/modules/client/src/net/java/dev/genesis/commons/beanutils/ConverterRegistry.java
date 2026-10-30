@@ -70,28 +70,27 @@ public final class ConverterRegistry extends ConvertUtilsBean {
       registry.register(Boolean.class, new BooleanConverter(null));
       registry.register(boolean[].class, new BooleanArrayConverter(
             new boolean[0]));
-      registry.register(Byte.TYPE, new ByteConverter(new Byte((byte)0)));
+      registry.register(Byte.TYPE, new ByteConverter((byte) 0));
       registry.register(Byte.class, new ByteConverter(null));
       registry.register(byte[].class, new ByteArrayConverter(new byte[0]));
-      registry.register(Character.TYPE, new CharacterConverter(new Character(
-            ' ')));
+      registry.register(Character.TYPE, new CharacterConverter(' '));
       registry.register(Character.class, new CharacterConverter(null));
       registry.register(char[].class, new CharacterArrayConverter(new char[0]));
       registry.register(Class.class, new ClassConverter());
-      registry.register(Double.TYPE, new DoubleConverter(new Double(0.0)));
+      registry.register(Double.TYPE, new DoubleConverter(0.0));
       registry.register(Double.class, new DoubleConverter(null));
       registry
             .register(double[].class, new DoubleArrayConverter(new double[0]));
-      registry.register(Float.TYPE, new FloatConverter(new Float(0.0f)));
+      registry.register(Float.TYPE, new FloatConverter(0.0f));
       registry.register(Float.class, new FloatConverter(null));
       registry.register(float[].class, new FloatArrayConverter(new float[0]));
-      registry.register(Integer.TYPE, new IntegerConverter(new Integer(0)));
+      registry.register(Integer.TYPE, new IntegerConverter(0));
       registry.register(Integer.class, new IntegerConverter(null));
       registry.register(int[].class, new IntegerArrayConverter(new int[0]));
-      registry.register(Long.TYPE, new LongConverter(new Long(0L)));
+      registry.register(Long.TYPE, new LongConverter(0L));
       registry.register(Long.class, new LongConverter(null));
       registry.register(long[].class, new LongArrayConverter(new long[0]));
-      registry.register(Short.TYPE, new ShortConverter(new Short((short)0)));
+      registry.register(Short.TYPE, new ShortConverter((short) 0));
       registry.register(Short.class, new ShortConverter(null));
       registry.register(short[].class, new ShortArrayConverter(new short[0]));
       registry.register(String.class, new StringConverter());

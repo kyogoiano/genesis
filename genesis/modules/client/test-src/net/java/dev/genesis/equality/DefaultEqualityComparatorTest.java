@@ -25,15 +25,15 @@ public class DefaultEqualityComparatorTest extends GenesisTestCase {
       DefaultEqualityComparator comparator = new DefaultEqualityComparator();
 
       String s = "1";
-      Integer i = new Integer(1);
+      Integer i = 1;
 
       assertTrue(comparator.equals(null, null));
       assertFalse(comparator.equals(null, s));
       assertFalse(comparator.equals(s, null));
       assertTrue(comparator.equals(s, s));
-      assertTrue(comparator.equals(s, new String("1")));
+      assertTrue(comparator.equals(s, "1"));
       assertTrue(comparator.equals(i, i));
-      assertTrue(comparator.equals(i, new Integer(1)));
+      assertTrue(comparator.equals(i, 1));
       assertFalse(comparator.equals(s, i));
    }
 }

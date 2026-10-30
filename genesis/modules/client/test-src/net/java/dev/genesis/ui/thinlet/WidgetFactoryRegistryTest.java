@@ -49,7 +49,7 @@ public class WidgetFactoryRegistryTest extends GenesisTestCase {
    public void testRegister() {
       registry.register(Number.class, factory);
 
-      Integer number = new Integer(0);
+      Integer number = 0;
 
       assertSame(factory, registry.get(number));
       assertSame(WIDGET, (registry.get(number)).create(null,
@@ -61,7 +61,7 @@ public class WidgetFactoryRegistryTest extends GenesisTestCase {
    public void testDeregister() {
       registry.register(Number.class, factory);
 
-      Integer number = new Integer(0);
+      Integer number = 0;
       assertSame(factory, registry.get(number));
 
       registry.deregister(Number.class);

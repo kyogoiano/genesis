@@ -158,7 +158,7 @@ public class MockFormController implements FormController {
    }
    
    public void setMaximumEvaluationTimes(int times) {
-      Integer i = new Integer(times);
+      Integer i = times;
       map.put("setMaximumEvaluationTimes(times)", i);
       map.put("this.maximumEvaluationTimes", i);
   }
@@ -171,11 +171,11 @@ public class MockFormController implements FormController {
          return true;
       }
 
-      return b.booleanValue();
+      return b;
    }
 
    public void setResetOnDataProviderChange(boolean resetOnDataProviderChange) {
-      Boolean b = new Boolean(resetOnDataProviderChange);
+      Boolean b = resetOnDataProviderChange;
       map.put("setResetOnDataProviderChange(resetOnDataProviderChange)", b);
       map.put("this.resetOnDataProviderChange", b);
    }

@@ -59,14 +59,14 @@ public class JSliderComponentBinderTest extends GenesisTestCase {
       boundField = componentBinder.bind(binder, slider, fieldMeta);
       assertNotNull(boundField);
 
-      boundField.setValue(new Integer(3));
+      boundField.setValue(3);
       assertEquals(3, slider.getValue());
 
-      boundField.setValue(new Integer(100));
+      boundField.setValue(100);
       assertEquals(100, slider.getValue());
    }
 
-   public void testUpdateValue() throws Exception {
+   public void testUpdateValue() {
       assertNull(componentBinder.bind(binder, slider, (ActionMetadata) null));
       assertNull(componentBinder.bind(binder, slider,
             (DataProviderMetadata) null));

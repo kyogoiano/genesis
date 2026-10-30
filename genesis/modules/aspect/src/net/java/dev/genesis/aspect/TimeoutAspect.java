@@ -265,7 +265,7 @@ public class TimeoutAspect {
          setWorkerThread(null);
 
          throw new TimeoutException(Bundle.getMessage(TimeoutAspect.class,
-               "EXECUTION_TOOK_MORE_THAN_X_MS", new Long(timeout))); // NOI18N
+               "EXECUTION_TOOK_MORE_THAN_X_MS", timeout)); // NOI18N
       }
  
       final Throwable throwable = thread.getThrowable();

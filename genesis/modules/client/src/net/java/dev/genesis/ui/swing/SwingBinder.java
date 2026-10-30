@@ -395,10 +395,9 @@ public class SwingBinder extends AbstractBinder {
                   if (method.getDeclaringClass() != FormControllerListener.class
                         || EventQueue.isDispatchThread()) {
                      if (isHashCode(method)) {
-                        return new Integer(SwingBinder.this.listener.hashCode());
+                        return SwingBinder.this.listener.hashCode();
                      } else if (isEqualMethod(method)) {
-                        return Boolean
-                              .valueOf(SwingBinder.this.listener == args[0]);
+                        return SwingBinder.this.listener == args[0];
                      }
 
                      try {
@@ -415,12 +414,10 @@ public class SwingBinder extends AbstractBinder {
                      public void run() {
                         try {
                            result[0] = method.invoke(SwingBinder.this, args);
-                        } catch (IllegalArgumentException ex) {
+                        } catch (IllegalArgumentException | IllegalAccessException ex) {
                            throwable[0] = ex;
                         } catch (InvocationTargetException ex) {
                            throwable[0] = ex.getTargetException();
-                        } catch (IllegalAccessException ex) {
-                           throwable[0] = ex;
                         }
                      }
                   });

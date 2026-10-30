@@ -1321,13 +1321,13 @@ public abstract class ScriptFunctionsTest extends TestCase {
 
       public void populateAllFields() {
          setFieldBooleanWrapper(Boolean.FALSE);
-         setFieldByteWrapper(new Byte(Byte.MIN_VALUE));
-         setFieldCharacterWrapper(new Character(Character.MIN_VALUE));
-         setFieldDoubleWrapper(new Double(Double.MIN_VALUE));
-         setFieldFloatWrapper(new Float(Float.MIN_VALUE));
-         setFieldIntegerWrapper(new Integer(Integer.MIN_VALUE));
-         setFieldLongWrapper(new Long(Long.MIN_VALUE));
-         setFieldShortWrapper(new Short(Short.MIN_VALUE));
+         setFieldByteWrapper(Byte.MIN_VALUE);
+         setFieldCharacterWrapper(Character.MIN_VALUE);
+         setFieldDoubleWrapper(Double.MIN_VALUE);
+         setFieldFloatWrapper(Float.MIN_VALUE);
+         setFieldIntegerWrapper(Integer.MIN_VALUE);
+         setFieldLongWrapper(Long.MIN_VALUE);
+         setFieldShortWrapper(Short.MIN_VALUE);
          setFieldString("string");
          setFieldStringWithoutTrim("string");
          setFieldBigDecimal(new BigDecimal("1234567890.1234567890"));
@@ -1350,28 +1350,28 @@ public abstract class ScriptFunctionsTest extends TestCase {
          setFieldBooleanWrapperArray(new Boolean[] { Boolean.FALSE,
                Boolean.TRUE });
          setFieldByteArray(new byte[] { Byte.MIN_VALUE, Byte.MAX_VALUE });
-         setFieldByteWrapperArray(new Byte[] { new Byte(Byte.MIN_VALUE),
-               new Byte(Byte.MAX_VALUE) });
+         setFieldByteWrapperArray(new Byte[] {Byte.MIN_VALUE,
+                 Byte.MAX_VALUE});
          setFieldCharArray(new char[] { Character.MIN_VALUE,
                Character.MAX_VALUE });
          setFieldCharacterWrapperArray(new Character[] {
-               new Character(Character.MIN_VALUE),
-               new Character(Character.MAX_VALUE) });
+                 Character.MIN_VALUE,
+                 Character.MAX_VALUE});
          setFieldDoubleArray(new double[] { Double.MIN_VALUE, Double.MAX_VALUE });
          setFieldDoubleWrapperArray(new Double[] {
-               new Double(Double.MIN_VALUE), new Double(Double.MAX_VALUE) });
+                 Double.MIN_VALUE, Double.MAX_VALUE});
          setFieldFloatArray(new float[] { Float.MIN_VALUE, Float.MAX_VALUE });
-         setFieldFloatWrapperArray(new Float[] { new Float(Float.MIN_VALUE),
-               new Float(Float.MAX_VALUE) });
+         setFieldFloatWrapperArray(new Float[] { Float.MIN_VALUE,
+               Float.MAX_VALUE });
          setFieldIntegerArray(new int[] { Integer.MIN_VALUE, Integer.MAX_VALUE });
          setFieldIntegerWrapperArray(new Integer[] {
-               new Integer(Integer.MIN_VALUE), new Integer(Integer.MAX_VALUE) });
+               Integer.MIN_VALUE, Integer.MAX_VALUE });
          setFieldLongArray(new long[] { Long.MIN_VALUE, Long.MAX_VALUE });
-         setFieldLongWrapperArray(new Long[] { new Long(Long.MIN_VALUE),
-               new Long(Long.MAX_VALUE) });
+         setFieldLongWrapperArray(new Long[] { Long.MIN_VALUE,
+               Long.MAX_VALUE });
          setFieldShortArray(new short[] { Short.MIN_VALUE, Short.MAX_VALUE });
-         setFieldShortWrapperArray(new Short[] { new Short(Short.MIN_VALUE),
-               new Short(Short.MAX_VALUE) });
+         setFieldShortWrapperArray(new Short[] { Short.MIN_VALUE,
+               Short.MAX_VALUE });
          setFieldStringArray(new String[] { "string[0]", "string[1]" });
          setFieldObjectArray(new Object[] { new Object(), new Object() });
          setFieldBeanArray(new RegularJavaBean[] { new RegularJavaBean(),

@@ -61,10 +61,10 @@ public class JProgressBarComponentBinderTest extends GenesisTestCase {
 
       assertEquals(0, progress.getValue());
 
-      boundField.setValue(new Integer(3));
+      boundField.setValue(3);
       assertEquals(3, progress.getValue());
 
-      boundField.setValue(new Integer(100));
+      boundField.setValue(100);
       assertEquals(100, progress.getValue());
    }
 }

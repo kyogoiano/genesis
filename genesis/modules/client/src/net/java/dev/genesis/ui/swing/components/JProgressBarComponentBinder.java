@@ -55,12 +55,11 @@ public class JProgressBarComponentBinder extends AbstractComponentBinder {
          return fieldMetadata;
       }
 
-      protected int toInt(Object value) throws Exception {
-         Integer integer = (Integer) BeanUtilsBean.getInstance()
-               .getConvertUtils().lookup(Integer.TYPE).convert(Integer.TYPE,
-                     value);
+      protected int toInt(Object value) {
 
-         return integer.intValue();
+          return BeanUtilsBean.getInstance()
+                .getConvertUtils().lookup(Integer.TYPE).convert(Integer.TYPE,
+                      value);
       }
 
       public void setValue(Object value) throws Exception {
@@ -68,7 +67,7 @@ public class JProgressBarComponentBinder extends AbstractComponentBinder {
       }
 
       public String getValue() {
-         return format(fieldMetadata, new Integer(component.getValue()));
+         return format(fieldMetadata, component.getValue());
       }
    }
 }

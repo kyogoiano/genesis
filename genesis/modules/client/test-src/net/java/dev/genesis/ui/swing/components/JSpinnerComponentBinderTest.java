@@ -60,11 +60,11 @@ public class JSpinnerComponentBinderTest extends GenesisTestCase {
       boundField = componentBinder.bind(binder, spinner, fieldMeta);
       assertNotNull(boundField);
 
-      boundField.setValue(new Integer(3));
-      assertEquals(new Integer(3), spinner.getValue());
+      boundField.setValue(3);
+      assertEquals(3, spinner.getValue());
 
-      boundField.setValue(new Integer(100));
-      assertEquals(new Integer(100), spinner.getValue());
+      boundField.setValue(100);
+      assertEquals(100, spinner.getValue());
    }
 
    public void testUpdateValue() throws Exception {
@@ -73,13 +73,13 @@ public class JSpinnerComponentBinderTest extends GenesisTestCase {
             (DataProviderMetadata) null));
       assertNotNull(componentBinder.bind(binder, spinner, fieldMeta));
 
-      spinner.setValue(new Integer(3));
+      spinner.setValue(3);
       Integer value = (Integer) binder
             .get("populateForm(FieldMetadata,Object)");
       assertNotNull(value);
       assertEquals(3, value.intValue());
 
-      spinner.setValue(new Integer(100));
+      spinner.setValue(100);
       value = (Integer) binder.get("populateForm(FieldMetadata,Object)");
       assertNotNull(value);
       assertEquals(100, value.intValue());

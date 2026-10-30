@@ -72,7 +72,7 @@ public class RegistryFactoryTest extends GenesisTestCase {
 
    public void testGet() {
       factory.register(Object.class, new Object());
-      factory.register(Integer.class, new Integer(1));
+      factory.register(Integer.class, 1);
 
       // Test for regular class with registered instance
       assertEquals(Integer.class, factory.get(Integer.class).getClass());
