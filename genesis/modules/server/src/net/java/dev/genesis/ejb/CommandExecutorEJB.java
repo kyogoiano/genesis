@@ -20,15 +20,14 @@ package net.java.dev.genesis.ejb;
 
 import java.lang.reflect.InvocationTargetException;
 
-import javax.ejb.EJBException;
-import javax.ejb.SessionContext;
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.ejb.EJBException;
+import jakarta.ejb.SessionContext;
+import jakarta.ejb.Stateless;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import net.java.dev.genesis.command.TransactionalInjector;
 import net.java.dev.genesis.command.CommandExecutionGuard;
@@ -47,15 +46,10 @@ public class CommandExecutorEJB implements CommandExecutor, CommandExecutorLocal
          final String className = (String)ctx.lookup(
                "java:comp/env/TransactionalInjector"); // NOI18N
          injector = (TransactionalInjector)Class.forName(className, true, 
-               Thread.currentThread().getContextClassLoader()).newInstance();
-      } catch (final NamingException ne) {
-         throw new EJBException(ne);
-      } catch (final ClassNotFoundException cnfe) {
-         throw new EJBException(cnfe);
-      } catch (final InstantiationException ie) {
-         throw new EJBException(ie);
-      } catch (final IllegalAccessException iae) {
-         throw new EJBException(iae);
+               Thread.currentThread().getContextClassLoader())
+               .getDeclaredConstructor().newInstance();
+      } catch (final Exception e) {
+         throw new EJBException(e);
       }
 
       injector.init(sessionContext);

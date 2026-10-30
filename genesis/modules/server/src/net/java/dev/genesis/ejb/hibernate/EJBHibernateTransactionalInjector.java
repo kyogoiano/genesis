@@ -18,8 +18,8 @@
  */
 package net.java.dev.genesis.ejb.hibernate;
 
-import javax.ejb.EJBException;
-import javax.ejb.SessionContext;
+import jakarta.ejb.EJBException;
+import jakarta.ejb.SessionContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 

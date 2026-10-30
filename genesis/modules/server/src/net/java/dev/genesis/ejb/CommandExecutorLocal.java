@@ -1,7 +1,7 @@
 package net.java.dev.genesis.ejb;
 
 import java.lang.reflect.InvocationTargetException;
-import javax.ejb.Local;
+import jakarta.ejb.Local;
 
 @Local
 public interface CommandExecutorLocal {

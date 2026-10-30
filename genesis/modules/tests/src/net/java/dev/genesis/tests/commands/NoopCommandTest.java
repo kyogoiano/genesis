@@ -21,8 +21,8 @@ package net.java.dev.genesis.tests.commands;
 import java.io.Serializable;
 
 import javax.naming.InitialContext;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
+import jakarta.transaction.Status;
+import jakarta.transaction.UserTransaction;
 
 import net.java.dev.genesis.annotation.Remotable;
 import net.java.dev.genesis.annotation.Transactional;

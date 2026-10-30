@@ -8,12 +8,12 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="target2" level="project" />
-    <orderEntry type="library" name="genesis-client-3.3" level="project" />
+    <orderEntry type="library" name="genesis-client-3.6.0" level="project" />
     <orderEntry type="library" name="commons" level="project" />
     <orderEntry type="library" name="script" level="project" />
-    <orderEntry type="library" name="genesis-annotation-3.3" level="project" />
+    <orderEntry type="library" name="genesis-annotation-3.6.0" level="project" />
     <orderEntry type="library" name="hibernate" level="project" />
-    <orderEntry type="library" name="genesis-shared-3.3" level="project" />
+    <orderEntry type="library" name="genesis-shared-3.6.0" level="project" />
     <orderEntry type="library" name="j2ee" level="project" />
     <orderEntry type="library" name="target" level="project" />
     <orderEntry type="library" name="dist" level="project" />

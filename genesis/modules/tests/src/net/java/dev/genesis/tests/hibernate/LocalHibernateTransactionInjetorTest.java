@@ -26,7 +26,7 @@ import net.java.dev.genesis.command.hibernate.AbstractHibernateCommand;
 import net.java.dev.genesis.tests.TestCase;
 import org.hibernate.Hibernate;
 import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 
 public class LocalHibernateTransactionInjetorTest extends TestCase {
    public void tearDown() throws Exception {

@@ -13,8 +13,9 @@ To run only the client tests:
    ./gradlew :client:test
 
 The client tests include Swing tests and therefore need a working graphical
-environment. The tests module uses embedded Apache OpenEJB 8.0.16 and deploys
-the executor through EJB 3 business interfaces. Run its integration tests with:
+environment. The tests module uses embedded Apache TomEE / OpenEJB 9.1.3 and
+deploys the executor through Jakarta Enterprise Beans 4.0 business interfaces.
+Run its integration tests with:
 
    ./gradlew :tests:integrationTest
 
@@ -25,22 +26,22 @@ The test task excludes the abstract `TestCase` helper and `ValidatorTest`; the l
 
 Dependencies are resolved from Maven Central except the historical
 `reusable-components-20060810.jar`, which remains local. The executor uses EJB
-3 business interfaces; its interfaces are regular sources and no longer require
-XDoclet generation. The refreshed Commons and Taglibs dependency versions are
+4.0 business interfaces; its interfaces are regular sources and no longer require
+XDoclet generation. The Jakarta EE 9.1 and Commons dependency versions are
 centralized in `gradle/libs.versions.toml` and shared between production and test configurations.
-The client uses the Servlet 3.1 API as a compile-only dependency because a web
-container supplies it. Apache Taglibs Standard 1.2.5 is the latest release in
-the `javax` namespace and remains compatible with these APIs. The scripting
-module uses the Expression Language 3.0 API and GlassFish reference
+The client uses the Jakarta Servlet 5.0 API as a compile-only dependency because a web
+container supplies it, along with Jakarta Standard Tag Library 2.0 (`jakarta.servlet.jsp.jstl`).
+The scripting module uses the Jakarta Expression Language 4.0 API and GlassFish reference
 implementation instead of the deprecated JSP EL and Commons EL APIs. Genesis
 selects the GlassFish implementation directly so the host container's EL
 provider setting cannot interfere with function argument conversion.
-Hibernate is upgraded to 5.6.15.Final, with the matching `javax.persistence`
-2.2 API. Its legacy Criteria API remains in use as a compatibility bridge.
+Hibernate is upgraded to `org.hibernate.orm:hibernate-core` 6.1.7.Final, with the matching
+`jakarta.persistence` 3.0 and `jakarta.transaction` 2.0 APIs, and a JPA Criteria-backed
+compatibility bridge for Genesis Criteria commands.
 
 Ant remains available for other legacy tasks. Its EJB 2.x server compilation
 and home-interface generation, aspect compilation, annotation preprocessing,
-weaving, and test workflows are retired. Use Gradle to compile the EJB 3 server
+weaving, and test workflows are retired. Use Gradle to compile the EJB 4 server
 module, build AspectJ, and run tests. The legacy sample-project Ant templates
 remain for reference, but their aspect-dependent build and deployment flows
 are retired.

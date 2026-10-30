@@ -1,7 +1,7 @@
 package net.java.dev.genesis.ejb;
 
 import java.lang.reflect.InvocationTargetException;
-import javax.ejb.Remote;
+import jakarta.ejb.Remote;
 
 @Remote
 public interface CommandExecutor {

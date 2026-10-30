@@ -18,9 +18,14 @@
  */
 package net.java.dev.genesis.hibernate.type;
 
-public class SimNaoType extends org.hibernate.type.BooleanType {
+public class SimNaoType extends org.hibernate.type.AbstractSingleColumnStandardBasicType<Boolean> {
     public SimNaoType() {
-        super(org.hibernate.type.descriptor.sql.CharTypeDescriptor.INSTANCE,
-              new org.hibernate.type.descriptor.java.BooleanTypeDescriptor('S', 'N'));
+        super(org.hibernate.type.descriptor.jdbc.CharJdbcType.INSTANCE,
+              new org.hibernate.type.descriptor.java.BooleanJavaType('S', 'N'));
+    }
+
+    @Override
+    public String getName() {
+        return "sim_nao";
     }
 }

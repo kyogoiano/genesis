@@ -67,7 +67,7 @@ public class CriteriaCommandExecutor extends AbstractHibernateCommand {
       final HibernateCriteria hibCriteria = (HibernateCriteria) realCommand;
 
       if (persisterClassName != null && persisterClassName.trim().length() != 0) {
-         final Criteria crit = getSession().createCriteria(
+         final Criteria crit = createCriteria(
                ClassesCache.getClass(persisterClassName));
          
          hibCriteria.setCriteria(crit);

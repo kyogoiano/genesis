@@ -25,7 +25,7 @@ import net.java.dev.genesis.paging.PageImpl;
 import net.java.dev.genesis.paging.Pager;
 import net.java.dev.genesis.paging.PagingException;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 
 
 public class QueryPager implements Pager {

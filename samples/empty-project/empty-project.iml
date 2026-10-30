@@ -8,8 +8,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="target2" level="project" />
-    <orderEntry type="library" name="genesis-client-3.3" level="project" />
-    <orderEntry type="library" name="genesis-shared-3.3" level="project" />
+    <orderEntry type="library" name="genesis-client-3.6.0" level="project" />
+    <orderEntry type="library" name="genesis-shared-3.6.0" level="project" />
     <orderEntry type="library" name="target" level="project" />
     <orderEntry type="library" name="dist" level="project" />
     <orderEntry type="module" module-name="client" />
