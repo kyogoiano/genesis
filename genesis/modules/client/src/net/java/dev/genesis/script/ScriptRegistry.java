@@ -45,14 +45,18 @@ public class ScriptRegistry {
    private ScriptRegistry() {
       registry.put(JXPATH,
             "net.java.dev.genesis.script.jxpath.JXPathScriptFactory"); // NOI18N
+      // BeanShell via its own BSFScriptFactory wrapper is kept for backwards
+      // compatibility; it does not pull in the BSF jar because BSFScriptFactory
+      // was replaced by a direct-Rhino implementation and beanshell has its own
+      // BshScriptEngineFactory (JSR-223) registered automatically.
       registry.put(BEANSHELL,
-            "net.java.dev.genesis.script.bsf.BSFScriptFactory"); // NOI18N
+            "net.java.dev.genesis.script.javaxscript.JavaxScriptScriptFactory"); // NOI18N
       registry.put(EL, "net.java.dev.genesis.script.el.ELScriptFactory"); // NOI18N
-      
+      // JavaScript uses Mozilla Rhino 1.8 via JSR-223 (rhino-engine artifact).
+      // BSF was removed; rhino-engine registers itself under "javascript" and
+      // "rhino" so no BSF bridge is needed.  This path works on JDK 11–21+.
       registry.put(JAVASCRIPT,
-            ScriptUtils.supportsJavaxScript() ?
-                  "net.java.dev.genesis.script.javaxscript.JavaxScriptScriptFactory" // NOI18N
-                  : "net.java.dev.genesis.script.bsf.BSFScriptFactory"); // NOI18N
+            "net.java.dev.genesis.script.javaxscript.JavaxScriptScriptFactory"); // NOI18N
    }
 
    public static ScriptRegistry getInstance() {

@@ -42,9 +42,9 @@ public class KeyValueListCellRendererTest extends GenesisTestCase {
 
    public void testFormat() {
       KeyValueListCellRenderer renderer = new KeyValueListCellRenderer(
-            new JComboBox());
+            new JComboBox<>());
       assertEquals("1", renderer.format("1"));
-      assertEquals("1", renderer.format(new Integer(1)));
+      assertEquals("1", renderer.format(1));
       assertEquals(" ", renderer.format(""));
       assertEquals(" ", renderer.format(null));
    }
@@ -59,7 +59,7 @@ public class KeyValueListCellRendererTest extends GenesisTestCase {
 
       KeyValueListCellRenderer renderer = new KeyValueListCellRenderer(combo);
       assertEquals("1", renderer.format("1"));
-      assertEquals("1", renderer.format(new Integer(1)));
+      assertEquals("1", renderer.format(1));
       assertEquals(" ", renderer.format(""));
       assertEquals(" ", renderer.format(null));
    }

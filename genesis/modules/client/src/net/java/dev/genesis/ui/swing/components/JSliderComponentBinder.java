@@ -72,19 +72,18 @@ public class JSliderComponentBinder extends AbstractComponentBinder {
       }
 
       protected Object getCurrentValue() {
-         return new Integer(component.getValue());
+         return component.getValue();
       }
 
       public String getValue() {
          return format(fieldMetadata, getCurrentValue());
       }
 
-      protected int toInt(Object value) throws Exception {
-         Integer integer = (Integer) BeanUtilsBean.getInstance()
-               .getConvertUtils().lookup(Integer.TYPE).convert(Integer.TYPE,
-                     value);
+      protected int toInt(Object value) {
 
-         return integer.intValue();
+          return BeanUtilsBean.getInstance()
+                .getConvertUtils().lookup(Integer.TYPE).convert(Integer.TYPE,
+                      value);
       }
 
       public void setValue(Object value) throws Exception {

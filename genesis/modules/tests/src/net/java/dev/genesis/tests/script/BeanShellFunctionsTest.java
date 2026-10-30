@@ -19,11 +19,11 @@
 package net.java.dev.genesis.tests.script;
 
 import net.java.dev.genesis.script.ScriptFactory;
-import net.java.dev.genesis.script.bsf.BSFScriptFactory;
+import net.java.dev.genesis.script.javaxscript.JavaxScriptScriptFactory;
 
 public class BeanShellFunctionsTest extends ScriptFunctionsTest {
    protected ScriptFactory newScriptFactory() {
-      BSFScriptFactory factory = new BSFScriptFactory();
+      JavaxScriptScriptFactory factory = new JavaxScriptScriptFactory();
       factory.setLang("beanshell");
       return factory;
    }

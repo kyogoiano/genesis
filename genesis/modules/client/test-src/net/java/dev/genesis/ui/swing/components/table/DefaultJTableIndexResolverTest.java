@@ -59,14 +59,14 @@ public class DefaultJTableIndexResolverTest extends GenesisTestCase {
       }
 
       Map map = new HashMap();
-      map.put(new Integer(1), new Integer(3));
-      map.put(new Integer(2), new Integer(2));
-      map.put(new Integer(3), new Integer(4));
-      map.put(new Integer(4), new Integer(0));
-      map.put(new Integer(5), new Integer(1));
+      map.put(1, 3);
+      map.put(2, 2);
+      map.put(3, 4);
+      map.put(4, 0);
+      map.put(5, 1);
 
       for (int i = 1; i <= 5; i++) {
-         int modelIndex = ((Integer)map.get(new Integer(i))).intValue();
+         int modelIndex = (Integer) map.get(i);
          int viewIndex = modelIndex;
 
          validateIndexes(modelIndex, viewIndex);
@@ -79,7 +79,7 @@ public class DefaultJTableIndexResolverTest extends GenesisTestCase {
       sortableTable.sort();
 
       for (int i = 1; i <= 5; i++) {
-         int modelIndex = ((Integer)map.get(new Integer(i))).intValue();
+         int modelIndex = (Integer) map.get(i);
          int viewIndex = i - 1;
 
          validateIndexes(modelIndex, viewIndex);

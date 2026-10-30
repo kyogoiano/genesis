@@ -1,4 +1,5 @@
 plugins {
+    id 'java'
     id 'base'
 }
 
@@ -81,11 +82,12 @@ project(':client') {
     sourceSets.test.java.setSrcDirs(['test-src'])
     sourceSets.test.resources.setSrcDirs(['test-src'])
     sourceSets.test.resources.include('**/*.properties')
-
+    evaluationDependsOn(':aspect')
     dependencies {
         implementation project(':shared')
         implementation project(':annotation')
-        implementation 'bsf:bsf:2.4.0'
+        // BSF 2.4.0 removed – JavaScript now uses Mozilla Rhino 1.8 via JSR-223
+        // (rhino-engine) and BeanShell uses its built-in JSR-223 adapter.
         implementation libs.beanshell
         implementation libs.commons.jxpath
         implementation libs.commons.validator
@@ -95,10 +97,11 @@ project(':client') {
         implementation libs.javax.el.api
         implementation libs.javax.el.impl
         implementation libs.rhino
+        implementation libs.rhino.engine
         implementation 'net.sourceforge.thinlet:thinlet:2005-03-28'
         testImplementation 'junit:junit:4.13.2'
         testRuntimeOnly libs.aspectj.runtime
-        testRuntimeOnly files(project(':aspect').sourceSets.main.output.classesDirs)
+        testRuntimeOnly project(':aspect')
     }
 }
 
@@ -233,28 +236,29 @@ def aspectjWeaving = tasks.register('weaveAspectJ') {
                 return
             }
 
-            def wovenDirectory = layout.buildDirectory.dir(
+            def wovenDirectory = project.layout.buildDirectory.dir(
                     "aspectj-woven/${subproject.name}/${sourceSet.name}").get().asFile
-            delete wovenDirectory
+            project.delete wovenDirectory
             wovenDirectory.mkdirs()
 
-            javaexec {
+            project.providers.javaexec {
                 classpath = configurations.aspectjTools
                 mainClass = 'org.aspectj.tools.ajc.Main'
                 args '-inpath', classDirectory.absolutePath,
                         '-aspectpath', aspectClasses.absolutePath,
                         '-classpath', classpathFiles.collect { it.absolutePath }
-                                .join(File.pathSeparator),
+                        .join(File.pathSeparator),
                         '-d', wovenDirectory.absolutePath,
                         '-Xlint:ignore'
-            }
+            }.result.get() // O '.result.get()' força a execução síncrona imediata da tarefa externa
 
-            delete classDirectory
-            copy {
+
+            project.delete classDirectory
+            project.copy {
                 from wovenDirectory
                 into classDirectory
             }
-            delete wovenDirectory
+            project.delete wovenDirectory
         }
 
         project(':aspect').sourceSets.main.output.classesDirs.files.each {
@@ -275,9 +279,9 @@ def aspectjWeaving = tasks.register('weaveAspectJ') {
             }
             def wovenThinlet = layout.buildDirectory.dir(
                     'aspectj-woven/dependencies/thinlet').get().asFile
-            delete wovenThinlet
+            project.delete wovenThinlet
             wovenThinlet.mkdirs()
-            javaexec {
+            project.providers.javaexec {
                 classpath = configurations.aspectjTools
                 mainClass = 'org.aspectj.tools.ajc.Main'
                 args '-inpath', thinletJar.absolutePath,

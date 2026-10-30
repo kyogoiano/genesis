@@ -586,7 +586,8 @@ public abstract class BaseThinlet extends Thinlet implements
    /**
     * @deprecated Use populate(Object, Object, Map, boolean) instead
     */
-   protected void populate(Form bean) throws IllegalAccessException, 
+   @Deprecated
+   protected void populate(Form bean) throws IllegalAccessException,
                               InvocationTargetException, NoSuchMethodException {
       populate(bean, this);
    }
@@ -594,6 +595,7 @@ public abstract class BaseThinlet extends Thinlet implements
    /**
     * @deprecated Use populate(Object, Object, Map, boolean) instead
     */
+   @Deprecated
    protected void populate(Form bean, Object root) throws IllegalAccessException,
                               InvocationTargetException, NoSuchMethodException {
       populate(bean, root, new HashMap());
@@ -602,7 +604,8 @@ public abstract class BaseThinlet extends Thinlet implements
    /**
     * @deprecated Use populate(Object, Object, Map, boolean) instead
     */
-   protected void populate(Form bean, Object root, final Map properties) 
+   @Deprecated
+   protected void populate(Form bean, Object root, final Map properties)
          throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
       populate(bean, root, properties, true);
    }
@@ -623,46 +626,52 @@ public abstract class BaseThinlet extends Thinlet implements
       Object component;
       Collection groupComponents = null;
 
-      for (final Iterator propertyNames = properties.keySet().iterator();
-                                                   propertyNames.hasNext(); ) {
-         propertyName = propertyNames.next().toString();
-         component = find(root, propertyName);
+       for (Object o : properties.keySet()) {
+           propertyName = o.toString();
+           component = find(root, propertyName);
 
-         if (component == null) {
-            if (groupComponents == null) {
-               groupComponents = getAllOfClass(root, CHECKBOX);
-            }
-
-            for (final Iterator  i = groupComponents.iterator(); i.hasNext(); ) {
-               component = i.next();
-
-               if (propertyName.equals(getGroup(component)) && 
-                     isSelected(component)) {
-                  properties.put(propertyName, getName(component));
-                  break;
+           if (component == null) {
+               if (groupComponents == null) {
+                   groupComponents = getAllOfClass(root, CHECKBOX);
                }
-            }
 
-            continue;
-         }
+               for (Object groupComponent : groupComponents) {
+                   component = groupComponent;
 
-         type = getClass(component);
+                   if (propertyName.equals(getGroup(component)) &&
+                           isSelected(component)) {
+                       properties.put(propertyName, getName(component));
+                       break;
+                   }
+               }
 
-         if (type.equals(COMBOBOX) || type.equals(LIST)) {
-            component = getSelectedItem(component);
+               continue;
+           }
 
-            if (component != null) {
-               properties.put(propertyName, getName(component));
-            } else {
-               properties.put(propertyName, null);
-            }
-         } else if (type.equals(PROGRESS_BAR) || type.equals(SLIDER)) {
-            properties.put(propertyName, String.valueOf(getValue(component)));
-         } else if (type.equals(TABLE)) {
-            // skip it intentionally
-         } else {
-            properties.put(propertyName, getText(component));
-         }
+           type = getClass(component);
+
+           switch (type) {
+               case COMBOBOX:
+               case LIST:
+                   component = getSelectedItem(component);
+
+                   if (component != null) {
+                       properties.put(propertyName, getName(component));
+                   } else {
+                       properties.put(propertyName, null);
+                   }
+                   break;
+               case PROGRESS_BAR:
+               case SLIDER:
+                   properties.put(propertyName, String.valueOf(getValue(component)));
+                   break;
+               case TABLE:
+                   // skip it intentionally
+                   break;
+               default:
+                   properties.put(propertyName, getText(component));
+                   break;
+           }
       }
 
       if (changeBean) {
@@ -677,7 +686,8 @@ public abstract class BaseThinlet extends Thinlet implements
    /**
     * @deprecated
     */
-   protected void populateAndValidate(Form bean) throws IllegalAccessException, 
+   @Deprecated
+   protected void populateAndValidate(Form bean) throws IllegalAccessException,
          InvocationTargetException, NoSuchMethodException, ValidationException,
          ValidatorException {
       populateAndValidate(bean, this);
@@ -686,7 +696,8 @@ public abstract class BaseThinlet extends Thinlet implements
    /**
     * @deprecated
     */
-   protected void populateAndValidate(Form bean, Object root) 
+   @Deprecated
+   protected void populateAndValidate(Form bean, Object root)
          throws IllegalAccessException, InvocationTargetException, 
                 NoSuchMethodException, ValidationException, ValidatorException {
       final Map properties = new HashMap();
@@ -745,13 +756,13 @@ public abstract class BaseThinlet extends Thinlet implements
          add(component, createItemOfType("", "", null, type)); // NOI18N
       }
 
-      for (final Iterator i = EnumHelper.getInstance().values(clazz).iterator(); i.hasNext(); ) {
-         enumInstance = i.next();
-         key = enumInstance.toString();
+       for (Object o : EnumHelper.getInstance().values(clazz)) {
+           enumInstance = o;
+           key = enumInstance.toString();
 
-         add(component, createItemOfType(key, FormatterRegistry.getInstance()
-               .format(enumInstance), enumInstance, type));
-      }
+           add(component, createItemOfType(key, FormatterRegistry.getInstance()
+                   .format(enumInstance), enumInstance, type));
+       }
    }
 
    protected void populateFromCollection(String nome, Collection c, 
@@ -839,22 +850,22 @@ public abstract class BaseThinlet extends Thinlet implements
       }
 
 
-      for (final Iterator i = c.iterator(); i.hasNext(); ) {
-         o = i.next();
+       for (Object object : c) {
+           o = object;
 
-         key = getKey(formatters, keyProperty, componentName, o);
-         Object value = null;
-         description = virtual ? virtualFormatter.format(value = o)
-               : (valueProperty == null ? format(formatters,
-                     componentName + '.', value = o) : format(formatters, componentName
-                     + '.' + valueProperty, value = getProperty(componentName, o,
-                     valueProperty)));
-         Object item = createItemOfType(key, description, value, type,
-               getWidgetFactory(widgetFactories, componentName + '.' + 
-               keyProperty));
+           key = getKey(formatters, keyProperty, componentName, o);
+           Object value = null;
+           description = virtual ? virtualFormatter.format(value = o)
+                   : (valueProperty == null ? format(formatters,
+                   componentName + '.', value = o) : format(formatters, componentName
+                   + '.' + valueProperty, value = getProperty(componentName, o,
+                   valueProperty)));
+           Object item = createItemOfType(key, description, value, type,
+                   getWidgetFactory(widgetFactories, componentName + '.' +
+                           keyProperty));
 
-         add(component, item);
-      }
+           add(component, item);
+       }
    }
 
    protected String getKey(Map formatters, String keyProperty,
@@ -918,7 +929,7 @@ public abstract class BaseThinlet extends Thinlet implements
             throw new IllegalArgumentException(Bundle.getMessage(
                   BaseThinlet.class,
                   "COLUMN_INDEX_X_TEXT_Y_IN_TABLE_Z_DOES_NOT_HAVE_A_NAME", // NOI18N
-                  new Object[] {new Integer(i), getText(columns[i]),
+                  new Object[] {i, getText(columns[i]),
                      componentName}));
          }
 
@@ -937,57 +948,57 @@ public abstract class BaseThinlet extends Thinlet implements
       int indexOfDot;
       boolean skip;
 
-      for (final Iterator i = c.iterator(); i.hasNext(); ) {
-         bean = i.next();
-         row = createRow();
+       for (Object o : c) {
+           bean = o;
+           row = createRow();
 
-         for (final Iterator it = propertyNames.iterator(); it.hasNext(); ) {
-            propertyName = it.next().toString();
+           for (Object name : propertyNames) {
+               propertyName = name.toString();
 
-            if (virtualPropertyNames.contains(propertyName)) {
-               Object cell = createItemOfType(propertyName,
-                     getVirtualFormatter(formatters, componentName,
-                     propertyName).format(bean), bean, ItemType.CELL,
-                     getWidgetFactory(widgetFactories, componentName + '.' + 
-                     propertyName));
-               add(row, cell);
-               continue;
-            }
-
-            indexOfDot = 0;
-            skip = false;
-
-            while ((indexOfDot = propertyName.indexOf('.', indexOfDot)) != -1) {
-               if (getProperty(componentName, bean, 
-                     propertyName.substring(0, indexOfDot)) == null) {
-                  Object cell = createItemOfType(propertyName, format(
-                        formatters, componentName + '.' + propertyName, null),
-                        null, ItemType.CELL, getWidgetFactory(widgetFactories, 
-                        componentName + '.' + propertyName));
-
-                  add(row, cell);
-                  skip = true;
-                  break;
+               if (virtualPropertyNames.contains(propertyName)) {
+                   Object cell = createItemOfType(propertyName,
+                           getVirtualFormatter(formatters, componentName,
+                                   propertyName).format(bean), bean, ItemType.CELL,
+                           getWidgetFactory(widgetFactories, componentName + '.' +
+                                   propertyName));
+                   add(row, cell);
+                   continue;
                }
 
-               indexOfDot += 1;
-            }
+               indexOfDot = 0;
+               skip = false;
 
-            if (skip) {
-               continue;
-            }
+               while ((indexOfDot = propertyName.indexOf('.', indexOfDot)) != -1) {
+                   if (getProperty(componentName, bean,
+                           propertyName.substring(0, indexOfDot)) == null) {
+                       Object cell = createItemOfType(propertyName, format(
+                                       formatters, componentName + '.' + propertyName, null),
+                               null, ItemType.CELL, getWidgetFactory(widgetFactories,
+                                       componentName + '.' + propertyName));
 
-            Object value = getProperty(componentName, bean, propertyName);
-            Object cell = createItemOfType(propertyName, format(formatters,
-                  componentName + '.' + propertyName, value), value,
-                  ItemType.CELL, getWidgetFactory(widgetFactories, 
-                  componentName + '.' + propertyName));
+                       add(row, cell);
+                       skip = true;
+                       break;
+                   }
 
-            add(row, cell);
-         }
+                   indexOfDot += 1;
+               }
 
-         add(component, row);
-      }
+               if (skip) {
+                   continue;
+               }
+
+               Object value = getProperty(componentName, bean, propertyName);
+               Object cell = createItemOfType(propertyName, format(formatters,
+                               componentName + '.' + propertyName, value), value,
+                       ItemType.CELL, getWidgetFactory(widgetFactories,
+                               componentName + '.' + propertyName));
+
+               add(row, cell);
+           }
+
+           add(component, row);
+       }
    }
 
    private Formatter getVirtualFormatter(Map formatters, String componentName, 
@@ -1105,9 +1116,9 @@ public abstract class BaseThinlet extends Thinlet implements
                "NO_FORM_IS_CURRENTLY_BOUND_TO_WIDGET")); // NOI18N
       }
 
-      for (final Iterator i = formPerClass.values().iterator(); i.hasNext(); ) {
-         refreshViewFromForm(i.next());
-      }
+       for (Object o : formPerClass.values()) {
+           refreshViewFromForm(o);
+       }
    }
 
    public void refreshViewFromForm(Object form) throws Exception {

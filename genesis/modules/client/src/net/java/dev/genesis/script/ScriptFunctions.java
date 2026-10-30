@@ -1,6 +1,6 @@
 /*
  * The Genesis Project
- * Copyright (C) 2005-2008  Summa Technologies do Brasil Ltda.
+ * Copyright (C) 2005-2024  Summa Technologies do Brasil Ltda.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -56,6 +56,24 @@ public class ScriptFunctions {
       final Object value2 = scriptValue2.getValue();
 
       if (comp1 == comp2) {
+         // Special case: Rhino's JSR-223 engine coerces all JavaScript numeric
+         // literals (e.g. 123.0) to Long.  When the form field is a floating-
+         // point type (Double/Float) and the script arg arrived as Long, compare
+         // by double value rather than using the typed comparator which would
+         // call Double.equals(Long) → false.
+         // This mirrors the behaviour of the old BSF/Rhino bridge where the
+         // custom WrapFactory preserved Double for JS number literals.
+         if (isFloatFieldVsScriptLong(value1, value2)
+               || isFloatFieldVsScriptLong(value2, value1)) {
+            boolean result = Double.compare(((Number) value1).doubleValue(),
+                  ((Number) value2).doubleValue()) == 0;
+            if (log.isDebugEnabled()) {
+               log.debug("Float-vs-Long numeric equals for '" + value1 // NOI18N
+                     + "' and '" + value2 + "': " + result); // NOI18N
+            }
+            return result;
+         }
+
          if (log.isDebugEnabled()) {
             log.debug("Evaluation equals for '" + value1 + "' and '" + value2 // NOI18N
                   + "' with same comparator " + comp1); // NOI18N
@@ -87,10 +105,28 @@ public class ScriptFunctions {
          }
          return comp2.equals(value2, value1);
       }
+
       if (log.isDebugEnabled()) {
          log.debug("'" + value1 + "' and '" + value2 // NOI18N
                + "' have different classes"); // NOI18N
       }
       return false;
+   }
+
+   /**
+    * Returns {@code true} when {@code fieldValue} is a Java floating-point
+    * number ({@code Double} or {@code Float}) and {@code scriptValue} is a
+    * {@code Long} produced by Rhino's JSR-223 coercion of a JavaScript numeric
+    * literal.
+    *
+    * <p>This lets {@code genesis.equals('form:fieldDouble', 123.0)} return
+    * {@code true} even though Rhino passes the JS literal as {@code Long(123)}.
+    * Integer-typed fields are intentionally excluded so that, for example,
+    * {@code Short(120)} and {@code Integer(120)} remain non-equal.</p>
+    */
+   private static boolean isFloatFieldVsScriptLong(Object fieldValue,
+         Object scriptValue) {
+      return (fieldValue instanceof Double || fieldValue instanceof Float)
+            && scriptValue instanceof Long;
    }
 }

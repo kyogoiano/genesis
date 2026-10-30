@@ -285,7 +285,7 @@ public class JTableComponentBinder extends AbstractComponentBinder {
             throw new IllegalArgumentException(Bundle.getMessage(
                   JTableComponentBinder.class,
                   "COLUMN_NUMBER_X_FROM_TABLE_Y_DOES_NOT_HAVE_AN_IDENTIFIER", // NOI18N
-                  new Integer(column.getModelIndex()), getBinder().getName(
+                    column.getModelIndex(), getBinder().getName(
                   getComponent())));
          }
 

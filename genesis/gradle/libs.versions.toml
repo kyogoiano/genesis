@@ -39,3 +39,4 @@ aspectj-runtime = { module = "org.aspectj:aspectjrt", version.ref = "aspectj" }
 aspectj-tools = { module = "org.aspectj:aspectjtools", version.ref = "aspectj" }
 beanshell = { module = "org.apache-extras.beanshell:bsh", version.ref = "beanshell" }
 rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
+rhino-engine = { module = "org.mozilla:rhino-engine", version.ref = "rhino" }

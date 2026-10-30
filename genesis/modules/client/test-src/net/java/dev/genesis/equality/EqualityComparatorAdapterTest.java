@@ -23,14 +23,12 @@ import net.java.dev.genesis.GenesisTestCase;
 
 public class EqualityComparatorAdapterTest extends GenesisTestCase {
    public void testComparator() {
-      Comparator adaptee = new Comparator() {
-         public int compare(Object o1, Object o2) {
-            Comparable c1 = (Comparable)o1;
-            Comparable c2 = (Comparable)o2;
+      Comparator adaptee = (o1, o2) -> {
+         Comparable c1 = (Comparable)o1;
+         Comparable c2 = (Comparable)o2;
 
-            return c1 != null ? (c2 == null ? -1 : -c1.compareTo(c2)) : 
-               (c2 == null ? 0 : 1);
-         }
+         return c1 != null ? (c2 == null ? -1 : -c1.compareTo(c2)) :
+            (c2 == null ? 0 : 1);
       };
       
       EqualityComparatorAdapter comparator = new EqualityComparatorAdapter(
@@ -38,19 +36,19 @@ public class EqualityComparatorAdapterTest extends GenesisTestCase {
 
       String s1 = "a";
       String s2 = "b";
-      Integer i1 = new Integer(1);
-      Integer i2 = new Integer(2);
+      Integer i1 = 1;
+      Integer i2 = 2;
 
       assertTrue(comparator.equals(null, null));
       assertFalse(comparator.equals(null, s1));
       assertFalse(comparator.equals(s1, null));
 
       assertTrue(comparator.equals(s1, s1));
-      assertTrue(comparator.equals(s1, new String("a")));
+      assertTrue(comparator.equals(s1, "a"));
       assertFalse(comparator.equals(s1, s2));
 
       assertTrue(comparator.equals(i1, i1));
-      assertTrue(comparator.equals(i1, new Integer(1)));
+      assertTrue(comparator.equals(i1, 1));
       assertFalse(comparator.equals(i1, i2));
       
       try {

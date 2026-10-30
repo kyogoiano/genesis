@@ -95,7 +95,7 @@
             <type>jar</type>
             <url>http://jakarta.apache.org/bsf/</url>
             <properties>
-              <comment>If BSF is used (needed when using javascript in JDKs without javax.script API)</comment>
+              <comment>If BSF is used (javascript uses BSF + Mozilla Rhino; Nashorn is gone after JDK 11)</comment>
             </properties>
         </dependency>
         <dependency>
@@ -179,7 +179,7 @@
             <type>jar</type>
             <url>http://www.mozilla.org/rhino/</url>
             <properties>
-              <comment>Unit test dependency for Java 1.4</comment>
+              <comment>Mozilla Rhino JavaScript engine used by BSF (JDK 11 / 17+ replacement for Nashorn)</comment>
             </properties>
         </dependency>
     </dependencies>

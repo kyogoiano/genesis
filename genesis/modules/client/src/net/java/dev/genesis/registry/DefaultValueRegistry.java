@@ -23,12 +23,12 @@ public class DefaultValueRegistry extends Registry {
 
    private DefaultValueRegistry() {
       register(Boolean.TYPE, Boolean.FALSE);
-      register(Byte.TYPE, new Byte((byte)0));
-      register(Short.TYPE, new Short((short)0));
-      register(Integer.TYPE, new Integer(0));
-      register(Long.TYPE, new Long(0));
-      register(Float.TYPE, new Float(0));
-      register(Double.TYPE, new Double(0));
+      register(Byte.TYPE, (byte) 0);
+      register(Short.TYPE, (short) 0);
+      register(Integer.TYPE, 0);
+      register(Long.TYPE, 0L);
+      register(Float.TYPE, (float) 0);
+      register(Double.TYPE, (double) 0);
    }
 
    public static final DefaultValueRegistry getInstance() {

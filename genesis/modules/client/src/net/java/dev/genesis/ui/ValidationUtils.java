@@ -106,49 +106,48 @@ public final class ValidationUtils {
       Arg arg;
       int argsLength;
 
-      for (final Iterator properties = results.getPropertyNames().iterator();
-                                                      properties.hasNext(); ) {
-         property = properties.next().toString();
-         field = form.getField(property);
-         result = results.getValidatorResult(property);
+       for (String s : results.getPropertyNames()) {
+           property = s;
+           field = form.getField(property);
+           result = results.getValidatorResult(property);
 
-         for (final Iterator actionNames = result.getActions();  
-               actionNames.hasNext(); ) {
-            actionName = actionNames.next().toString();
+           for (final Iterator<String> actionNames = result.getActions();
+                actionNames.hasNext(); ) {
+               actionName = actionNames.next();
 
-            if (result.isValid(actionName)) {
-               continue;
-            }
-
-            msg = field.getMsg(actionName);
-
-            if (msg == null) {
-               msg = resources.getValidatorAction(actionName).getMsg();
-            }
-
-            msg = UIUtils.getInstance().getBundle().getString(msg);
-
-            argsLength = field.getArgs(actionName).length;
-            args = new String[argsLength];
-
-            for (int i = 0; i < argsLength; i++) {
-               arg = field.getArg(actionName, i);
-
-               if (arg == null) {
-                  break;
+               if (result.isValid(actionName)) {
+                   continue;
                }
 
-               args[i] = arg.getKey();
-               
-               if (arg.isResource()) {
-                  args[i] = UIUtils.getInstance().getBundle().getString(args[i]);
-               }
-            }
+               msg = field.getMsg(actionName);
 
-            messages.put(property, MessageFormat.format(msg, args));
-            break;
-         }
-      }
+               if (msg == null) {
+                   msg = resources.getValidatorAction(actionName).getMsg();
+               }
+
+               msg = UIUtils.getInstance().getBundle().getString(msg);
+
+               argsLength = field.getArgs(actionName).length;
+               args = new String[argsLength];
+
+               for (int i = 0; i < argsLength; i++) {
+                   arg = field.getArg(actionName, i);
+
+                   if (arg == null) {
+                       break;
+                   }
+
+                   args[i] = arg.getKey();
+
+                   if (arg.isResource()) {
+                       args[i] = UIUtils.getInstance().getBundle().getString(args[i]);
+                   }
+               }
+
+               messages.put(property, MessageFormat.format(msg, (Object[]) args));
+               break;
+           }
+       }
 
       return messages;
    }

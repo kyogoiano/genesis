@@ -55,15 +55,15 @@ public class DefaultJTableIndexResolver implements JTableIndexResolver {
       public int convertRowIndexToModel(final JComponent component,
             final int index) throws IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
-         return ((Integer)convertRowIndexToModel.invoke(component,
-               new Object[] {new Integer(index)})).intValue();
+         return (Integer) convertRowIndexToModel.invoke(component,
+                 new Object[]{index});
       }
 
       public int convertRowIndexToView(final JComponent component,
             final int index) throws IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
-         return ((Integer)convertRowIndexToView.invoke(component,
-               new Object[] {new Integer(index)})).intValue();
+         return (Integer) convertRowIndexToView.invoke(component,
+                 new Object[]{index});
       }
    }
 
