@@ -29,7 +29,6 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.aspectwerkz.AspectContext;
 
 public class HibernateTransactionalInjector implements TransactionalInjector {
    private static final Log log =
@@ -40,8 +39,7 @@ public class HibernateTransactionalInjector implements TransactionalInjector {
    private Session session;
    
    public void init(Object context) {
-      if (!(context instanceof AspectContext) || "false".equals( // NOI18N
-            ((AspectContext)context).getParameter("preLoadSessionFactory"))) { // NOI18N
+      if (!Boolean.getBoolean("genesis.aspect.preLoadSessionFactory")) {
          return;
       }
       

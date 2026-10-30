@@ -88,13 +88,15 @@ public class HibernateCommandTest extends TestCase {
         @Remotable
         public int remotable() throws Exception {
             value++;
-            return ((UserTransaction) new InitialContext().lookup("UserTransaction")).getStatus();
+            return ((UserTransaction) new InitialContext().lookup(
+                  "java:comp/UserTransaction")).getStatus();
         }
 
         @Transactional
         public int transactional() throws Exception {
             value++;
-            return ((UserTransaction) new InitialContext().lookup("UserTransaction")).getStatus();
+            return ((UserTransaction) new InitialContext().lookup(
+                  "java:comp/UserTransaction")).getStatus();
         }
 
     }
@@ -110,7 +112,8 @@ public class HibernateCommandTest extends TestCase {
 
         public int invokeRemotable() throws Exception {
             value++;
-            return ((UserTransaction) new InitialContext().lookup("UserTransaction")).getStatus();
+            return ((UserTransaction) new InitialContext().lookup(
+                  "java:comp/UserTransaction")).getStatus();
         }
     }
 
@@ -125,7 +128,8 @@ public class HibernateCommandTest extends TestCase {
 
         public int invokeTransactional() throws Exception {
             value++;
-            return ((UserTransaction) new InitialContext().lookup("UserTransaction")).getStatus();
+            return ((UserTransaction) new InitialContext().lookup(
+                  "java:comp/UserTransaction")).getStatus();
         }
     }
 

@@ -1,0 +1,41 @@
+[versions]
+beanutils = "1.11.0"
+commons-logging = "1.4.0"
+commons-jxpath = "1.4.0"
+commons-validator = "1.11.0"
+taglibs = "1.2.5"
+servlet = "3.1.0"
+el = "3.0.1-b06"
+el-impl = "3.0.1-b12"
+hibernate = "5.6.15.Final"
+javax-persistence = "2.2"
+javax-annotation = "1.3.2"
+javax-ejb = "3.2.2"
+javax-transaction = "1.3"
+beanshell = "2.0b6"
+rhino = "1.8.0"
+tomee = "8.0.16"
+hsqldb = "2.7.4"
+aspectj = "1.9.21"
+
+[libraries]
+commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "beanutils" }
+commons-logging = { module = "commons-logging:commons-logging", version.ref = "commons-logging" }
+commons-jxpath = { module = "commons-jxpath:commons-jxpath", version.ref = "commons-jxpath" }
+commons-validator = { module = "commons-validator:commons-validator", version.ref = "commons-validator" }
+taglibs-standard-impl = { module = "org.apache.taglibs:taglibs-standard-impl", version.ref = "taglibs" }
+taglibs-standard-spec = { module = "org.apache.taglibs:taglibs-standard-spec", version.ref = "taglibs" }
+javax-servlet-api = { module = "javax.servlet:javax.servlet-api", version.ref = "servlet" }
+javax-el-api = { module = "javax.el:javax.el-api", version.ref = "el" }
+javax-el-impl = { module = "org.glassfish:javax.el", version.ref = "el-impl" }
+hibernate-core = { module = "org.hibernate:hibernate-core", version.ref = "hibernate" }
+javax-persistence-api = { module = "javax.persistence:javax.persistence-api", version.ref = "javax-persistence" }
+javax-annotation-api = { module = "javax.annotation:javax.annotation-api", version.ref = "javax-annotation" }
+javax-ejb-api = { module = "javax.ejb:javax.ejb-api", version.ref = "javax-ejb" }
+javax-transaction-api = { module = "javax.transaction:javax.transaction-api", version.ref = "javax-transaction" }
+tomee-embedded-core = { module = "org.apache.tomee:openejb-core", version.ref = "tomee" }
+hsqldb = { module = "org.hsqldb:hsqldb", version.ref = "hsqldb" }
+aspectj-runtime = { module = "org.aspectj:aspectjrt", version.ref = "aspectj" }
+aspectj-tools = { module = "org.aspectj:aspectjtools", version.ref = "aspectj" }
+beanshell = { module = "org.apache-extras.beanshell:bsh", version.ref = "beanshell" }
+rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }

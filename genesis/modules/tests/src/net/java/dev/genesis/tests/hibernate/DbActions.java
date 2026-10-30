@@ -18,6 +18,8 @@
  */
 package net.java.dev.genesis.tests.hibernate;
 
+import java.util.List;
+
 import net.java.dev.genesis.annotation.Remotable;
 import net.java.dev.genesis.annotation.Transactional;
 import net.java.dev.genesis.command.hibernate.AbstractHibernateCommand;
@@ -28,8 +30,7 @@ public class DbActions extends AbstractHibernateCommand {
 
 	@Transactional
 	public void deleteAll() throws Exception {
-        HibernateBean bean = new HibernateBean();
-        getSession().delete("from HibernateBean", bean);
+        getSession().createQuery("delete from HibernateBean").executeUpdate();
 	}
 
 	@Transactional
@@ -41,6 +42,12 @@ public class DbActions extends AbstractHibernateCommand {
 			getSession().save(bean);
 		}
 	}
+
+    @Remotable
+    public List getPrimaryKeys() {
+        return getSession().createQuery(
+              "select bean.pk from HibernateBean bean").list();
+    }
 
     @Remotable
 	public Page getPageUsingCriteria(int pageNumber, int resultsPerPage)

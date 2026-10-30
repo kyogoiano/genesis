@@ -19,63 +19,66 @@
 package net.java.dev.genesis.aspect;
 
 import java.lang.reflect.Method;
+import java.io.Serializable;
 import java.util.Map;
 
 import net.java.dev.genesis.annotation.Criteria;
+import net.java.dev.genesis.command.CommandExecutionGuard;
+import net.java.dev.genesis.command.hibernate.HibernateCriteria;
 import net.java.dev.genesis.command.hibernate.CriteriaCommandExecutor;
 import net.java.dev.genesis.command.hibernate.CriteriaResolver;
 
 import net.java.dev.genesis.util.Bundle;
-import org.codehaus.aspectwerkz.AspectContext;
-import org.codehaus.aspectwerkz.annotation.Around;
-import org.codehaus.aspectwerkz.annotation.Aspect;
-import org.codehaus.aspectwerkz.annotation.Mixin;
-import org.codehaus.aspectwerkz.joinpoint.JoinPoint;
-import org.codehaus.aspectwerkz.joinpoint.MethodRtti;
-import org.codehaus.backport175.reader.Annotations;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.DeclareMixin;
+import org.aspectj.lang.reflect.MethodSignature;
 
-@Aspect("perJVM")
-public class CriteriaCommandExecutionAspect extends CommandInvocationAspect {
+@Aspect
+public class CriteriaCommandExecutionAspect {
    private ThreadLocal threadLocal = new InheritableThreadLocal();
-   
-   private boolean preventStackOverflow;
 
-   public CriteriaCommandExecutionAspect(final AspectContext ctx) {
-      super(ctx);
-      preventStackOverflow = "true".equals(ctx.getParameter("preventStackOverflow")); // NOI18N
+   private boolean preventStackOverflow() {
+      return Boolean.getBoolean("genesis.aspect.preventCriteriaStackOverflow");
    }
 
-   @Around("criteriaCommandExecution")
-   public Object commandExecution(JoinPoint jp) throws Throwable {
-      final MethodRtti rtti = (MethodRtti)jp.getRtti();
+   @Around("execution(@net.java.dev.genesis.annotation.Criteria * *(..))"
+         + " && this(net.java.dev.genesis.command.hibernate.HibernateCriteria+)")
+   public Object commandExecution(ProceedingJoinPoint joinPoint) throws Throwable {
+      if (CommandExecutionGuard.isExecuting()) {
+         return joinPoint.proceed();
+      }
+
+      Method method = ((MethodSignature)joinPoint.getSignature()).getMethod();
+      boolean preventStackOverflow = preventStackOverflow();
 
       if (preventStackOverflow) {
          Method m = (Method)threadLocal.get();
-         if (m != null && m.equals(rtti.getMethod())) {
-            Object value = jp.proceed();
+         if (m != null && m.equals(method)) {
+            Object value = joinPoint.proceed();
             threadLocal.set(null);
             return value;
          }
       }
 
-      final CriteriaResolver obj = (CriteriaResolver)jp.getTarget();
-      final Class[] classes = rtti.getParameterTypes();
+      final CriteriaResolver obj = (CriteriaResolver)joinPoint.getTarget();
+      final Class[] classes = method.getParameterTypes();
       final String[] classNames = new String[classes.length];
 
       for (int i = 0; i < classes.length; i++) {
          classNames[i] = classes[i].getName();
       }
 
-      final String methodName = rtti.getMethod().getName();
-      final Object[] parameterValues = rtti.getParameterValues();
+      final String methodName = method.getName();
+      final Object[] parameterValues = joinPoint.getArgs();
 
-      final Criteria annon = (Criteria) Annotations.getAnnotation(
-            Criteria.class, rtti.getMethod());
+      final Criteria annon = method.getAnnotation(Criteria.class);
       
       final CriteriaAnnotationParser parser = new CriteriaAnnotationParser(annon);
       
       if (preventStackOverflow) {
-         threadLocal.set(rtti.getMethod());
+         threadLocal.set(method);
       }
 
       try {
@@ -145,8 +148,14 @@ public class CriteriaCommandExecutionAspect extends CommandInvocationAspect {
       }
    }
 
-   @Mixin(pointcut="criteriaResolverIntroduction", isTransient=true, deploymentModel="perInstance")
-   public static class CriteriaResolverImpl implements CriteriaResolver {
+   @DeclareMixin("net.java.dev.genesis.command.hibernate.HibernateCriteria+")
+   public static CriteriaResolver createCriteriaResolver(HibernateCriteria target) {
+      return new CriteriaResolverImpl();
+   }
+
+   public static class CriteriaResolverImpl
+         implements CriteriaResolver, Serializable {
+      private static final long serialVersionUID = 1L;
       private Map propertiesMap;
 
       public Map getPropertiesMap() {

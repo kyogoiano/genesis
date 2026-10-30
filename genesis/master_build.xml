@@ -66,14 +66,9 @@
    </target>
 
    <target name="-do-master-init-paths">
-      <property name="genesis.version" value="3.4.0" />
+      <property name="genesis.version" value="3.5.0" />
       <property name="genesis.home" value="../genesis" />
       <property name="genesis.dist" location="${genesis.home}/dist" />
-      <property name="annotation.properties" 
-                location="${genesis.dist}/annotation.properties" />
-
-      <property name="aspectwerkz.dist" 
-                location="${genesis.home}/lib/aspectwerkz" />
       <property name="commons.dist" location="${genesis.home}/lib/commons" />
       <property name="hibernate.dist" location="${genesis.home}/lib/hibernate" />
       <property name="j2ee.dist" location="${genesis.home}/lib/j2ee" />
@@ -122,22 +117,6 @@
          </not>
       </condition>
 
-      <path id="aspectwerkz.path">
-         <fileset dir="${aspectwerkz.dist}">
-            <include name="aspectwerkz-*.jar" />
-            <include name="ant*.jar" />
-            <exclude name="asm*.jar" />
-            <include name="concurrent*.jar" />
-            <include name="dom4j*.jar" />
-            <include name="javassist*.jar" />
-            <include name="jrexx*.jar" />
-            <include name="junit*.jar" />
-            <include name="managementapi*.jar" />
-            <include name="qdox*.jar" />
-            <include name="trove*.jar" />
-         </fileset>
-      </path>
-
       <path id="j2ee.path">
          <fileset dir="${j2ee.dist}" includes="*.jar" />
       </path>
@@ -152,7 +131,6 @@
 
       <path id="anttasks.path">
          <path refid="backport175.path" />
-         <path refid="aspectwerkz.path" />
          <fileset dir="${anttasks.dist}" includes="*.jar" />
       </path>
 
@@ -210,67 +188,6 @@
                   executable="@{executable}">
                <src path="@{sourcesdir}" />
             </javac>
-         </sequential>
-      </macrodef>
-   </target>
-
-   <target name="define-aw-macros" depends="init-paths">
-      <macrodef name="annotationc"
-                uri="https://genesis.dev.java.net/nonav/ns/master_build.xml">
-         <attribute name="srcdir" />
-         <attribute name="destdir" />
-         <attribute name="classpath" />
-         <attribute name="touchfile" />
-         <element name="customize" optional="true" />
-         <element name="customize-classpath" optional="true" />
-         <element name="additional-classpath" optional="true" />
-
-         <sequential>
-            <taskdef name="annotationc" 
-                     classname="net.java.dev.genesis.anttasks.aspectwerkz.AnnotationCTask" 
-                     classpathref="anttasks.path" />
-
-            <mkdir dir="@{destdir}" />
-            <annotationc verbose="${verbose}"
-                  srcdir="@{srcdir}"
-                  destdir="@{destdir}"
-                  properties="${annotation.properties}">
-               <classpath>
-                  <path location="@{classpath}" />
-                  <fileset dir="${genesis.dist}" 
-                           includes="genesis-annotation-jdk15-${genesis.version}.jar" />
-                  <additional-classpath />
-                  <customize-classpath />
-               </classpath>
-               <customize />
-            </annotationc>
-            <copy todir="@{destdir}">
-               <fileset dir="@{classpath}" />
-            </copy>
-            <touch file="@{touchfile}" />
-         </sequential>
-      </macrodef>
-
-      <macrodef name="awc"
-                uri="https://genesis.dev.java.net/nonav/ns/master_build.xml">
-         <attribute name="verbose" default="false" />
-         <attribute name="taskverbose" default="${verbose}" />
-         <attribute name="genjp" default="${genjp}" />
-         <attribute name="classpath" />
-         <attribute name="sourcepath" />
-         <attribute name="destdir" />
-         <attribute name="touchfile" />
-         <sequential>
-            <taskdef name="awc" 
-                     classname="net.java.dev.genesis.anttasks.aspectwerkz.SimplifiedAspectWerkzCTask" 
-                     classpathref="anttasks.path" />
-
-            <mkdir dir="@{destdir}" />
-            <awc classpathref="@{classpath}" genjp="@{genjp}" destdir="@{destdir}"
-                 taskverbose="@{taskverbose}" verbose="@{verbose}">
-               <sourcepath location="@{sourcepath}"/>
-            </awc>
-            <touch file="@{touchfile}"/>
          </sequential>
       </macrodef>
    </target>
@@ -516,16 +433,12 @@
    </target>
 
    <target name="-do-shared-annotations">
-      <genesis:annotationc srcdir="${shared.sources.dir}" 
-                           destdir="${shared.annotated.dir}"
-                           classpath="${shared.classes.dir}"
-                           touchfile="${shared.annotated.timestamp.file}" />
+      <fail message="Legacy annotation preprocessing is retired. Use the Gradle AspectJ build." />
    </target>
 
    <target name="shared:annotations" if="shared.annotationc.tasks.needed"
-           depends="shared:check-annotations-needed,define-aw-macros,
-                    define-call-task">
-      <genesis:call target="-do-shared-annotations" />
+           depends="shared:check-annotations-needed">
+      <fail message="Legacy annotation preprocessing is retired. Use the Gradle AspectJ build." />
    </target>
 
    <target name="shared:master-check-hibernate-conditions" depends="shared:init">
@@ -888,7 +801,9 @@
            the weaving process -->
    </target>
 
-   <target name="weaving" depends="-do-custom-weaving" />
+   <target name="weaving">
+      <fail message="Ant weaving is retired. Use the Gradle AspectJ build." />
+   </target>
 
    <target name="jar:pre-init">
       <!-- Override to define any properties that shouldn't be redefined by 

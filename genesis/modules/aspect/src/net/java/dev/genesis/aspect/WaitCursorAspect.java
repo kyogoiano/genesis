@@ -21,23 +21,24 @@ package net.java.dev.genesis.aspect;
 import java.awt.Component;
 import java.awt.Cursor;
 
-import org.codehaus.aspectwerkz.annotation.Around;
-import org.codehaus.aspectwerkz.annotation.Aspect;
-import org.codehaus.aspectwerkz.joinpoint.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 
-@Aspect("perJVM")
+@Aspect
 public class WaitCursorAspect {
    
-   @Around("waitCursorExecution")
-   public Object waitCursorExecution(final JoinPoint jp) throws Throwable {
-      final Component c = (Component) jp.getTarget();
+   @Around("execution(* thinlet.Thinlet.invokeImpl(..))")
+   public Object waitCursorExecution(final ProceedingJoinPoint joinPoint)
+         throws Throwable {
+      final Component c = (Component)joinPoint.getTarget();
       final Cursor oldCursor = c.getCursor();
 
       Object ret = null;
 
       try {
          c.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-         ret = jp.proceed();
+         ret = joinPoint.proceed();
       } finally {
          c.setCursor(oldCursor);
       }

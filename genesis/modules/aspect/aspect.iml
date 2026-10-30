@@ -11,7 +11,6 @@
     <orderEntry type="library" name="genesis-client-3.3" level="project" />
     <orderEntry type="library" name="commons" level="project" />
     <orderEntry type="library" name="genesis-server-3.3" level="project" />
-    <orderEntry type="library" name="aspectwerkz" level="project" />
     <orderEntry type="library" name="genesis-annotation-3.3" level="project" />
     <orderEntry type="library" name="hibernate" level="project" />
     <orderEntry type="library" name="genesis-shared-3.3" level="project" />

@@ -6,86 +6,50 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.java.dev.genesis.aspect;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.io.Serializable;
 
 import net.java.dev.genesis.annotation.Remotable;
 import net.java.dev.genesis.annotation.Transactional;
 import net.java.dev.genesis.command.Query;
 import net.java.dev.genesis.command.Transaction;
 
-import org.codehaus.aspectwerkz.AspectContext;
-import org.codehaus.aspectwerkz.annotation.Mixin;
-import org.codehaus.aspectwerkz.aspect.management.Mixins;
-import org.codehaus.backport175.reader.Annotations;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.DeclareMixin;
 
+@Aspect
 public class CommandInvocationAspect {
-   protected final AspectContext ctx;
-   
-   public CommandInvocationAspect(AspectContext ctx) {
-      this.ctx = ctx;
+   @DeclareMixin("net.java.dev.genesis.command.Command+")
+   public static CommandResolver createCommandResolver() {
+      return new CommandResolverImpl();
    }
 
-   protected static boolean isPrototype(AspectContext context) {
-      try {
-         Method method;
-         try {
-            method = context.getClass().getMethod("isPrototype"); // NOI18N
-         } catch (NoSuchMethodException e) {
-            // AspectWerkz 2.1 represents prototypes with no associated object.
-            method = context.getClass().getMethod("getAssociatedObject"); // NOI18N
-            return method.invoke(context) == null;
-         }
-
-         return ((Boolean)method.invoke(context)).booleanValue();
-      } catch (ReflectiveOperationException e) {
-         throw new IllegalStateException("Unable to inspect AspectWerkz context", e); // NOI18N
-      }
+   public static boolean isRemotable(Method method) {
+      return !"false".equals(System.getProperty("genesis.aspect.useFastMode",
+            "true"))
+            || method.getAnnotation(Remotable.class) != null
+            || Query.class.isAssignableFrom(method.getDeclaringClass())
+            || isTransactional(method);
    }
-   
-   @Mixin(pointcut="commandResolverIntroduction", isTransient=true, deploymentModel="perJVM")
-   public static class CommandResolverImpl implements CommandResolver, Serializable {
-      private final boolean useFastMode;
 
-      public CommandResolverImpl() {
-         useFastMode = !"false".equals(Mixins.getParameters(getClass(), // NOI18N
-               getClass().getClassLoader()).get("useFastMode")); // NOI18N
+   public static boolean isTransactional(Method method) {
+      return method.getAnnotation(Transactional.class) != null
+            || Transaction.class.isAssignableFrom(method.getDeclaringClass());
+   }
+
+   public static class CommandResolverImpl implements CommandResolver,
+         Serializable {
+      private static final long serialVersionUID = 1L;
+
+      public boolean isRemotable(Method method) {
+         return CommandInvocationAspect.isRemotable(method);
       }
 
-      public boolean isRemotable(Method m) {
-         return useFastMode || Annotations.getAnnotation(Remotable.class, m) != null
-               || Query.class.isAssignableFrom(m.getDeclaringClass())
-               || isTransactional(m);
-      }
-
-      /**
-       * To be a <b>Transactional Method </b> the object and/or the method
-       * must satisfy at least one of the following conditions:
-       * <ul>
-       * <li>The object needs to implement
-       * <code>net.java.dev.genesis.command.Transaction</code>.</li>
-       * <li>The method must contain at least one <code>Transactional</code>
-       * annotation.</li>
-       * </ul>
-       *
-       * @param m
-       *            The proxy method
-       */
-      public boolean isTransactional(Method m) {
-         return Annotations.getAnnotation(Transactional.class, m) != null
-               || Transaction.class.isAssignableFrom(m.getDeclaringClass());
+      public boolean isTransactional(Method method) {
+         return CommandInvocationAspect.isTransactional(method);
       }
    }
 }

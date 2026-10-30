@@ -26,6 +26,7 @@ import java.sql.Types;
 
 import net.java.dev.genesis.helpers.EnumHelper;
 import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserType;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -48,7 +49,8 @@ public abstract class EnumType implements UserType {
         return false;
     }
 
-    public Object nullSafeGet(ResultSet resultSet, String[] str, Object obj) 
+    public Object nullSafeGet(ResultSet resultSet, String[] str,
+                              SharedSessionContractImplementor session, Object obj)
                                      throws HibernateException, SQLException {
        String key = resultSet.getString(str[0]);
 
@@ -63,8 +65,9 @@ public abstract class EnumType implements UserType {
        return EnumHelper.getInstance().valueOf(returnedClass(), key);
     }
 
-    public void nullSafeSet(PreparedStatement preparedStatement, Object obj, 
-                            int param) throws HibernateException, SQLException {
+    public void nullSafeSet(PreparedStatement preparedStatement, Object obj,
+                            int param, SharedSessionContractImplementor session)
+                            throws HibernateException, SQLException {
        obj = toDatabaseObject(obj);
 
        if (obj == null) {

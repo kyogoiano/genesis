@@ -30,7 +30,7 @@ import net.java.dev.genesis.command.hibernate.AbstractHibernateCriteria;
 import net.java.dev.genesis.command.hibernate.CriteriaResolver;
 import net.java.dev.genesis.helpers.CriteriaPropertyHelper;
 import net.java.dev.genesis.tests.TestCase;
-import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.Restrictions;
 
 
 public class HibernateCriteriaTest extends TestCase {
@@ -87,7 +87,7 @@ public class HibernateCriteriaTest extends TestCase {
    public static class CriteriaTester extends AbstractHibernateCriteria {
 
       public void setCode(String code) {
-         getCriteria().add(Expression.eq("code", code));
+         getCriteria().add(Restrictions.eq("code", code));
       }
 
       @Criteria(net.java.dev.genesis.tests.hibernate.HibernateBean.class)

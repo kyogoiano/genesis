@@ -47,7 +47,8 @@ public class NoopTransactionTest extends TestCase {
 
         public int invokeTransactional() throws Exception {
             value++;
-            return ((UserTransaction) new InitialContext().lookup("UserTransaction")).getStatus();
+            return ((UserTransaction) new InitialContext().lookup(
+                  "java:comp/UserTransaction")).getStatus();
         }
 
         public void localMethod() {

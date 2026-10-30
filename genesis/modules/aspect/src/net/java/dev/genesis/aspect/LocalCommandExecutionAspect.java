@@ -1,98 +1,56 @@
 /*
  * The Genesis Project
  * Copyright (C) 2004-2009  Summa Technologies do Brasil Ltda.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.java.dev.genesis.aspect;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import net.java.dev.genesis.command.TransactionalInjector;
 
-import org.codehaus.aspectwerkz.AspectContext;
-import org.codehaus.aspectwerkz.annotation.Around;
-import org.codehaus.aspectwerkz.annotation.Aspect;
-import org.codehaus.aspectwerkz.joinpoint.JoinPoint;
-import org.codehaus.aspectwerkz.joinpoint.MethodSignature;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 
-@Aspect("perJVM")
-public class LocalCommandExecutionAspect extends CommandInvocationAspect {
+@Aspect
+public class LocalCommandExecutionAspect {
    private final Map injectorsPerThread = new WeakHashMap();
    private final Map processingThreads = new WeakHashMap();
-   
-   public LocalCommandExecutionAspect(final AspectContext ctx) throws Exception {
-      super(ctx);
-   }
-   
-   private TransactionalInjector getTransactionalInjector() throws Exception {
-      Thread currentThread = Thread.currentThread();
-      TransactionalInjector injector = (TransactionalInjector)injectorsPerThread
-            .get(currentThread);
 
-      if (injector == null) {
-         injector = (TransactionalInjector)Class.forName(
-               ctx.getParameter("transactionalInjector"), true, // NOI18N
-               currentThread.getContextClassLoader()).newInstance();
-
-         if (!isPrototype(ctx)) {
-            injector.init(ctx);
-         }
-
-         injectorsPerThread.put(currentThread, injector);
+   @Around("(execution(* net.java.dev.genesis.command.Command+.invoke*(..))"
+         + " && (execution(* net.java.dev.genesis.command.Query+.*(..))"
+         + " || execution(* net.java.dev.genesis.command.Transaction+.*(..))))"
+         + " || execution(@net.java.dev.genesis.annotation.Remotable * *(..))"
+         + " || execution(@net.java.dev.genesis.annotation.Transactional * *(..))")
+   public Object commandExecution(ProceedingJoinPoint joinPoint) throws Throwable {
+      Method method = ((MethodSignature)joinPoint.getSignature()).getMethod();
+      if (!isLocalTestExecution(method.getDeclaringClass())) {
+         return joinPoint.proceed();
       }
 
-      return injector;
-   }
-
-   private boolean isReentrant() {
-      Thread currentThread = Thread.currentThread();
-      Boolean processing = (Boolean) processingThreads.get(currentThread);
-
-      if (Boolean.TRUE.equals(processing)) {
-         return true;
-      }
-
-      processingThreads.put(currentThread, Boolean.TRUE);
-
-      return false;
-   }
-    
-   @Around("localCommandExecution")
-   public Object commandExecution(final JoinPoint joinPoint) throws Throwable {
-      final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-      final CommandResolver obj = (CommandResolver)joinPoint.getTarget();
-      final boolean transactional = obj.isTransactional(methodSignature.getMethod());
-
-      if ((!transactional && !obj.isRemotable(methodSignature.getMethod())) || 
-            isReentrant()) {
+      Object target = joinPoint.getTarget();
+      boolean transactional = CommandInvocationAspect.isTransactional(method);
+      if ((!transactional && !CommandInvocationAspect.isRemotable(method))
+            || isReentrant()) {
          return joinPoint.proceed();
       }
 
       TransactionalInjector injector = getTransactionalInjector();
-
       try {
-         injector.beforeInvocation(obj, transactional);
-         final Object ret = joinPoint.proceed();
+         injector.beforeInvocation(target, transactional);
+         Object result = joinPoint.proceed();
          injector.afterInvocation();
-
-         return ret;
-      } catch (final Exception e) {
+         return result;
+      } catch (Exception e) {
          injector.onException(e);
-
          throw e;
       } finally {
          try {
@@ -101,5 +59,38 @@ public class LocalCommandExecutionAspect extends CommandInvocationAspect {
             processingThreads.remove(Thread.currentThread());
          }
       }
+   }
+
+   private boolean isLocalTestExecution(Class declaringClass) {
+      String className = declaringClass.getName();
+      return className.startsWith("net.java.dev.genesis.tests.")
+            && (className.contains("LocalCommandExecutionTest$")
+                  || className.contains("LocalHibernateTransactionInjetorTest$"));
+   }
+
+   private TransactionalInjector getTransactionalInjector() throws Exception {
+      Thread currentThread = Thread.currentThread();
+      TransactionalInjector injector =
+            (TransactionalInjector)injectorsPerThread.get(currentThread);
+      if (injector == null) {
+         String className = System.getProperty(
+               "genesis.aspect.transactionalInjector",
+               "net.java.dev.genesis.aspect.HibernateTransactionalInjector");
+         ClassLoader loader = currentThread.getContextClassLoader();
+         injector = (TransactionalInjector)Class.forName(className, true, loader)
+               .newInstance();
+         injector.init(null);
+         injectorsPerThread.put(currentThread, injector);
+      }
+      return injector;
+   }
+
+   private boolean isReentrant() {
+      Thread currentThread = Thread.currentThread();
+      if (Boolean.TRUE.equals(processingThreads.get(currentThread))) {
+         return true;
+      }
+      processingThreads.put(currentThread, Boolean.TRUE);
+      return false;
    }
 }

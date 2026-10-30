@@ -54,7 +54,6 @@
                  value="${weaving.xml.definition.dir}/aop.xml"/>
 
       <path id="weaving.standard.classpath">
-         <path path="${genesis.dist}/genesis-aspect-annotated-${genesis.version}.jar" />
          <path refid="shared.javac.classpath" />
          <path refid="j2ee.path" />
          <fileset dir="${client.lib.dir}" includes="*.jar" />
@@ -197,17 +196,13 @@
                            jndi="${genesis.command.executor.local.jndi}" />
    </target>
 
-   <target name="-do-weaving" 
-           depends="weaving:define-classpath,weaving:copy-files,
-                    define-aw-macros"
-           if="weaving.needed">
-      <genesis:awc classpath="weaving.classpath" 
-                   sourcepath="${preweaving.dir}"
-                   destdir="${weaving.dir}"
-                   touchfile="${weaving.timestamp.file}" />
+   <target name="-do-weaving">
+      <fail message="Ant weaving is retired. Use the Gradle AspectJ build." />
    </target>
 
-   <target name="weaving" depends="-do-weaving,-do-custom-weaving" />
+   <target name="weaving">
+      <fail message="Ant weaving is retired. Use the Gradle AspectJ build." />
+   </target>
 
    <target name="jar:additional-init">
       <property name="jar.client.name"
@@ -293,14 +288,6 @@
             <additional-fileset>
                <fileset dir="${genesis.dist}">
                   <include name="genesis-annotation-jdk14-${genesis.version}.jar" />
-                  <include name="genesis-aspect-annotated-${genesis.version}.jar" />
-               </fileset>
-               <fileset dir="${aspectwerkz.dist}">
-                  <include name="aspectwerkz-*.jar" />
-                  <include name="dom4j*.jar" />
-                  <include name="jrexx*.jar" />
-                  <include name="qdox*.jar" />
-                  <include name="trove*.jar" />
                </fileset>
                <fileset dir="${backport175.dist}">
                   <include name="backport175-*.jar" />
@@ -335,15 +322,7 @@
             <additional-fileset>
                <lib dir="${genesis.dist}">
                   <include name="genesis-annotation-jdk14-${genesis.version}.jar" />
-                  <include name="genesis-aspect-annotated-${genesis.version}.jar" />
                   <include name="genesis-shared-${genesis.version}.jar" />
-               </lib>
-               <lib dir="${aspectwerkz.dist}">
-                  <include name="aspectwerkz-*.jar" />
-                  <include name="dom4j*.jar" />
-                  <include name="jrexx*.jar" />
-                  <include name="qdox*.jar" />
-                  <include name="trove*.jar" />
                </lib>
                <lib dir="${backport175.dist}">
                   <include name="backport175-*.jar" />
