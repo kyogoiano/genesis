@@ -30,8 +30,9 @@ import net.java.dev.genesis.paging.hibernate.QueryPager;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.BindableType;
+import org.hibernate.query.Query;
 
 public abstract class AbstractHibernateCommand implements HibernateCommand {
    private Session session;
@@ -42,6 +43,10 @@ public abstract class AbstractHibernateCommand implements HibernateCommand {
 
    protected Session getSession() {
       return session;
+   }
+
+   protected Criteria createCriteria(final Class persistentClass) {
+      return Criteria.forSession(getSession(), persistentClass);
    }
 
    protected void appendClause(StringBuffer where, String condition) {
@@ -89,7 +94,7 @@ public abstract class AbstractHibernateCommand implements HibernateCommand {
 
          if (HibernateTypeValue.class.isAssignableFrom(valueClass)) {
             final HibernateTypeValue htv = (HibernateTypeValue)value;
-            q.setParameter(key, htv.getValue(), htv
+            q.setParameter(key, htv.getValue(), (BindableType) htv
                         .getType());
 	   } else if (Collection.class.isAssignableFrom(valueClass)) {
 		q.setParameterList(key, (Collection)value);

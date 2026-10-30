@@ -52,7 +52,7 @@ public class DbActions extends AbstractHibernateCommand {
     @Remotable
 	public Page getPageUsingCriteria(int pageNumber, int resultsPerPage)
 			throws Exception {
-		return getPage(getSession().createCriteria(HibernateBean.class),
+		return getPage(createCriteria(HibernateBean.class),
 				pageNumber, resultsPerPage);
 	}
 

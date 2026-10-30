@@ -35,9 +35,9 @@ The scripting module uses the Jakarta Expression Language 4.0 API and GlassFish 
 implementation instead of the deprecated JSP EL and Commons EL APIs. Genesis
 selects the GlassFish implementation directly so the host container's EL
 provider setting cannot interfere with function argument conversion.
-Hibernate is upgraded to `hibernate-core-jakarta` 5.6.15.Final, with the matching
-`jakarta.persistence` 3.0 and `jakarta.transaction` 2.0 APIs. Its legacy Criteria API
-remains in use as a compatibility bridge.
+Hibernate is upgraded to `org.hibernate.orm:hibernate-core` 6.1.7.Final, with the matching
+`jakarta.persistence` 3.0 and `jakarta.transaction` 2.0 APIs, and a JPA Criteria-backed
+compatibility bridge for Genesis Criteria commands.
 
 Ant remains available for other legacy tasks. Its EJB 2.x server compilation
 and home-interface generation, aspect compilation, annotation preprocessing,

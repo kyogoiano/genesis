@@ -68,7 +68,7 @@ public class HibernateTransactionalInjector implements TransactionalInjector {
       
       if (transactional) {
          transaction = session.beginTransaction();
-         session.setFlushMode(FlushMode.COMMIT);
+         session.setHibernateFlushMode(FlushMode.COMMIT);
       }
    }
    

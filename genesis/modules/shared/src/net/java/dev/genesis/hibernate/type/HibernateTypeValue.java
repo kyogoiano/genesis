@@ -21,6 +21,7 @@ package net.java.dev.genesis.hibernate.type;
 import org.hibernate.MappingException;
 import org.hibernate.type.CustomType;
 import org.hibernate.type.Type;
+import org.hibernate.type.spi.TypeConfiguration;
 import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
 
@@ -48,7 +49,7 @@ public class HibernateTypeValue {
          if (userType instanceof ParameterizedType) {
             ((ParameterizedType) userType).setParameterValues(parameters);
          }
-         return new CustomType(userType);
+         return new CustomType(userType, new TypeConfiguration());
       } catch (InstantiationException e) {
          throw new MappingException("Could not instantiate user type " + typeValue, e);
       } catch (IllegalAccessException e) {

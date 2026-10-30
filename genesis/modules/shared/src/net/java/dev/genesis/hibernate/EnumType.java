@@ -30,7 +30,7 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserType;
 import org.apache.commons.beanutils.BeanUtils;
 
-public abstract class EnumType implements UserType {
+public abstract class EnumType implements UserType<Object> {
     private static final int[] TYPES = new int[] {Types.VARCHAR};
 
     public Object deepCopy(Object obj) throws HibernateException {
@@ -47,6 +47,15 @@ public abstract class EnumType implements UserType {
 
     public boolean isMutable() {
         return false;
+    }
+
+    @Override
+    public Object nullSafeGet(ResultSet resultSet, int position,
+                              SharedSessionContractImplementor session, Object obj)
+                                     throws HibernateException, SQLException {
+       String key = resultSet.getString(position);
+
+       return toEnum(key);
     }
 
     public Object nullSafeGet(ResultSet resultSet, String[] str,
@@ -83,6 +92,11 @@ public abstract class EnumType implements UserType {
     }
 
     public abstract Class returnedClass();
+
+    @Override
+    public int getSqlType() {
+        return TYPES[0];
+    }
 
     public int[] sqlTypes() {
         return TYPES;
